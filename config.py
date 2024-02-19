@@ -10,5 +10,5 @@ suffix = "_LOCAL" if debug else ""
 db_username = os.getenv(f"DB_USER{suffix}")
 db_password = os.getenv(f"DB_PASSWORD{suffix}")
 db_host = os.getenv(f"DB_HOST{suffix}")
-db_port = os.getenv("DB_PORT")
+db_port = int(os.getenv("DB_PORT") or 5432)
 db_name = os.getenv(f"DB_NAME{suffix}")
