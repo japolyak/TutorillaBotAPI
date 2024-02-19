@@ -11,9 +11,7 @@ from routes.web_app_routes import router as web_app_router
 
 app = FastAPI()
 
-allowed_origins = [
-    telegram_web_app,
-]
+allowed_origins = [telegram_web_app]
 
 app.add_middleware(
     CORSMiddleware,
