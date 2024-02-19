@@ -23,6 +23,10 @@ app.add_middleware(
 
 init_db()
 
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
 app.include_router(admin_router, prefix="/admin", tags=["admin"])
 app.include_router(private_course_router, prefix="/private-courses", tags=["private-courses"])
 app.include_router(subject_router, prefix="/subjects", tags=["subjects"])
