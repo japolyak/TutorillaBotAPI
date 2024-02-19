@@ -1,6 +1,6 @@
 from fastapi import status, Depends, HTTPException, APIRouter, Request
 from bot_client.message_sender import send_accept_message, send_decline_message
-from .schemas import UserDto, UserBaseDto, UserRequestDto
+from .schemas import UserDto, UserRequestDto
 from database.crud import user_crud, admin_crud
 from sqlalchemy.orm import Session
 from database.db_setup import get_db

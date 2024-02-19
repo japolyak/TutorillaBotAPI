@@ -1,6 +1,6 @@
 from fastapi import status, APIRouter, Depends, HTTPException
 import json
-from .schemas import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList
+from .schemas import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto
 from sqlalchemy.orm import Session
 from database.db_setup import get_db
 from functions.time_transformator import transform_class_time
@@ -70,3 +70,16 @@ async def get_private_courses(user_id: int, private_course_id: int, db: Session 
 async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(get_db)):
     db_course = private_courses_crud.enroll_student_to_course(db=db, user_id=user_id, course_id=private_course_id)
     return db_course
+
+
+# Web_app
+@router.post(path="/{course_id}/new-class/", status_code=status.HTTP_201_CREATED,
+             description="Add new class for private course")
+async def add_new_class(course_id: int, new_class: NewClassDto, db: Session = Depends(get_db)):
+    schedule = new_class.date
+    assignment = {
+        "sources": [source.model_dump_json() for source in new_class.sources]
+    }
+    db_class = private_courses_crud.schedule_class(db=db, course_id=course_id, schedule=schedule, assignment=assignment)
+
+    return status.HTTP_201_CREATED
