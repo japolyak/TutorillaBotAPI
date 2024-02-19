@@ -1,7 +1,6 @@
 import os
 
 telegram_web_app = os.getenv("TELEGRAM_WEB_APP") or ''
-telegram_bot = os.getenv("TELEGRAM_BOT") or ''
 bot_token = os.getenv("BOT_TOKEN") or ''
 
 # Database
