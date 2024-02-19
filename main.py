@@ -25,7 +25,7 @@ init_db()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World test"}
 
 app.include_router(admin_router, prefix="/admin", tags=["admin"])
 app.include_router(private_course_router, prefix="/private-courses", tags=["private-courses"])
