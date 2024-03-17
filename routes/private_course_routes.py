@@ -72,14 +72,17 @@ async def get_private_courses(user_id: int, private_course_id: int, db: Session 
     return db_course
 
 
-# Web_app
 @router.post(path="/{course_id}/new-class/", status_code=status.HTTP_201_CREATED,
              description="Add new class for private course")
 async def add_new_class(course_id: int, new_class: NewClassDto, db: Session = Depends(get_db)):
+    """
+    Adds new class for private course from telegram web app
+    """
     schedule = new_class.date
     assignment = {
         "sources": [source.model_dump_json() for source in new_class.sources]
     }
-    db_class = private_courses_crud.schedule_class(db=db, course_id=course_id, schedule=schedule, assignment=assignment)
+
+    private_courses_crud.schedule_class(db=db, course_id=course_id, schedule=schedule, assignment=assignment)
 
     return status.HTTP_201_CREATED

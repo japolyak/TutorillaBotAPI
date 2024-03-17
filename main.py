@@ -11,11 +11,11 @@ from routes.web_app_routes import router as web_app_router
 
 app = FastAPI()
 
-allowed_origins = [telegram_web_app]
+allowed_origins = [telegram_web_app, "http://localhost:5173", "http://127.0.0.1:4040", "http://127.0.0.1:5173", "http://localhost:4040"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
