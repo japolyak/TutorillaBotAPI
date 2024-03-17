@@ -19,6 +19,7 @@ class User(Base):
     normalized_email: Mapped[str] = mapped_column(String(255), unique=True)
     phone_number: Mapped[str] = mapped_column(String(255), unique=True)
     time_zone: Mapped[float] = mapped_column(Float)
+    locale: Mapped[str] = mapped_column(String(10), server_default="en-US")
     is_tutor: Mapped[bool] = mapped_column(Boolean, server_default="false")
     is_student: Mapped[bool] = mapped_column(Boolean, server_default="false")
     is_admin: Mapped[bool] = mapped_column(Boolean, server_default="false")
@@ -68,6 +69,7 @@ class TutorCourse(Base):
     tutor_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     subject_id: Mapped[int] = mapped_column(ForeignKey("subjects.id"))
     is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
+    price: Mapped[int] = mapped_column(Integer)
 
     tutor: Mapped["User"] = relationship(back_populates="tutor_courses")
     subject: Mapped["Subject"] = relationship(back_populates="tutor_courses")
@@ -85,6 +87,7 @@ class PrivateCourse(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     student_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     course_id: Mapped[int] = mapped_column(ForeignKey("tutor_courses.id"))
+    price: Mapped[int] = mapped_column(Integer)
 
     student: Mapped["User"] = relationship(back_populates="private_courses")
     course: Mapped["TutorCourse"] = relationship(back_populates="private_courses")

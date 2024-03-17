@@ -28,6 +28,7 @@ class UserBaseDto(BaseModel):
 
 
 class UserDto(UserBaseDto):
+    locale: str
     normalized_email: str | None = None
     is_active: bool | None = None
     is_tutor: bool | None = None
@@ -62,6 +63,7 @@ class TutorCourseDto(BaseModel):
     tutor: UserDto
     subject: SubjectDto
     is_active: bool
+    price: int
 
     class Config:
         from_attributes = True
@@ -71,6 +73,7 @@ class PrivateCourseDto(BaseModel):
     id: int
     student: UserDto
     course: TutorCourseDto
+    price: int
 
     class Config:
         from_attributes = True
