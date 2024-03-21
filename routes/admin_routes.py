@@ -86,6 +86,6 @@ async def accept_student_role(user_id: int, db: Session = Depends(get_db)):
     if not declination:
         raise HTTPException(status_code=404, detail="Users request not found")
 
-    send_decline_message(db_user)
+    send_decline_message(db_user.id)
 
     return status.HTTP_200_OK
