@@ -1,6 +1,6 @@
 import os
 
-telegram_web_app = os.getenv("TELEGRAM_WEB_APP") or ''
+allowed_origins = os.getenv("ALLOWED_ORIGINS") or ''
 bot_token = os.getenv("BOT_TOKEN") or ''
 my_tg_id = os.getenv("MY_TG_ID") or ''
 
