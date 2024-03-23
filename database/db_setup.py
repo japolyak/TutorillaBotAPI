@@ -17,7 +17,6 @@ try:
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 except:
     pass
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False)
 
 def init_db():
     try:
