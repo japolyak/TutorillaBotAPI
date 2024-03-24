@@ -27,7 +27,7 @@ async def create_user(user: UserBaseDto, db: Session = Depends(get_db)):
     return new_user
 
 
-@router.post(path="/{user_id}/apply_role/{role}/", status_code=status.HTTP_201_CREATED)
+@router.post(path="/{user_id}/apply-role/{role}/", status_code=status.HTTP_201_CREATED)
 async def apply_student_role(user_id: int, role: str, db: Session = Depends(get_db)):
     """
     Applies role to user
