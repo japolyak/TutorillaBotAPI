@@ -9,7 +9,7 @@ from database.db_setup import get_db
 router = APIRouter()
 
 
-@router.get(path="/role-requests/{role}", status_code=status.HTTP_200_OK, response_model=list[UserRequestDto])
+@router.get(path="/role-requests/{role}/", status_code=status.HTTP_200_OK, response_model=list[UserRequestDto])
 async def get_requests(role: str, db: Session = Depends(get_db)):
     db_requests = admin_crud.get_users_requests(db=db, role=role)
     if db_requests is None:
@@ -18,7 +18,7 @@ async def get_requests(role: str, db: Session = Depends(get_db)):
     return db_requests
 
 
-@router.get(path="/user-requests/{role_request_id}", status_code=status.HTTP_200_OK, response_model=UserRequestDto)
+@router.get(path="/user-requests/{role_request_id}/", status_code=status.HTTP_200_OK, response_model=UserRequestDto)
 async def get_requests(role_request_id: int, db: Session = Depends(get_db)):
     db_request = admin_crud.get_user_request(db=db, role_request_id=role_request_id)
     if db_request is None:
@@ -27,7 +27,7 @@ async def get_requests(role_request_id: int, db: Session = Depends(get_db)):
     return db_request
 
 
-@router.put(path="/users/{user_id}/accept-role/{role}", status_code=status.HTTP_200_OK, response_model=UserDto)
+@router.put(path="/users/{user_id}/accept-role/{role}/", status_code=status.HTTP_200_OK, response_model=UserDto)
 async def accept_student_role(user_id: int, role: str, db: Session = Depends(get_db)):
     # admin_id: None or str = request.headers.get("Sender-Id")
     # if not admin_id:
@@ -62,7 +62,7 @@ async def accept_student_role(user_id: int, role: str, db: Session = Depends(get
     return acceptance
 
 
-@router.put(path="/users/{user_id}/decline-role", status_code=status.HTTP_200_OK)
+@router.put(path="/users/{user_id}/decline-role/", status_code=status.HTTP_200_OK)
 async def accept_student_role(user_id: int, db: Session = Depends(get_db)):
     # admin_id: None or str = request.headers.get("Sender-Id")
     # if not admin_id:

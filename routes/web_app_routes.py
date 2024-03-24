@@ -9,7 +9,7 @@ import json
 router = APIRouter()
 
 
-@router.get(path="/me")
+@router.get(path="/me/")
 async def validate_telegram_user(request: Request, db: Session = Depends(get_db)):
     init_data: None or str = request.headers.get("Init-Data")
 
