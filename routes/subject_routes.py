@@ -14,11 +14,11 @@ async def get_available_courses(user_id: int, role: str, db: Session = Depends(g
         raise HTTPException(status_code=400)
 
     if role == "student":
-        db_available_courses = subject_crud.get_available_subjects_student(db=db, user_id=user_id)
-        return db_available_courses
+        db_available_subjects = subject_crud.get_available_subjects_student(db=db, user_id=user_id)
+        return db_available_subjects
 
-    db_available_courses = subject_crud.get_available_subjects_tutor(db=db, user_id=user_id)
-    return db_available_courses
+    db_available_subjects = subject_crud.get_available_subjects_tutor(db=db, user_id=user_id)
+    return db_available_subjects
 
 
 @router.get(path="/users/{user_id}/", status_code=status.HTTP_200_OK,
