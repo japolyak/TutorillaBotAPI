@@ -48,13 +48,15 @@ def get_private_courses(db: Session, user_id: int, subject_name: str, role: str)
 
 # TODO - Consider rewriting this function
 def get_tutor_private_course(db: Session, user_id: int, private_course_id: int):
-    db_courses = db.query(PrivateCourse).filter(PrivateCourse.id == private_course_id).first()
+    db_course = db.query(PrivateCourse).filter(PrivateCourse.id == private_course_id).first()
 
-    return db_courses
+    return db_course
 
 
 def enroll_student_to_course(db: Session, user_id: int, course_id: int):
-    db_course = PrivateCourse(student_id=user_id, course_id=course_id)
+    db_course = db.query(TutorCourse).filter(TutorCourse.id == course_id).first()
+
+    db_course = PrivateCourse(student_id=user_id, course_id=course_id, price=db_course.price)
     db.add(db_course)
     db.commit()
     db.refresh(db_course)
