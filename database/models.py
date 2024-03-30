@@ -17,7 +17,6 @@ class User(Base):
     last_name: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(String(255), unique=True)
     normalized_email: Mapped[str] = mapped_column(String(255), unique=True)
-    phone_number: Mapped[str] = mapped_column(String(255), unique=True)
     time_zone: Mapped[float] = mapped_column(Float)
     locale: Mapped[str] = mapped_column(String(10), server_default="en-US")
     is_tutor: Mapped[bool] = mapped_column(Boolean, server_default="false")

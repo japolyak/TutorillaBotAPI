@@ -20,15 +20,14 @@ class UserBaseDto(BaseModel):
     first_name: str
     last_name: str
     email: str
-    phone_number: str
     time_zone: float
+    locale: str
 
     class Config:
         from_attributes = True
 
 
 class UserDto(UserBaseDto):
-    locale: str
     normalized_email: str | None = None
     is_active: bool | None = None
     is_tutor: bool | None = None

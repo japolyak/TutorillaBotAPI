@@ -3,12 +3,13 @@ from database.models import User, UserRequest
 from routes.schemas import UserBaseDto
 from datetime import datetime
 
+
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
 
 def create_user(db: Session, user: UserBaseDto):
-
+    print(user.locale)
     normalized_email = user.email.lower()
 
     db_user = User(
@@ -16,9 +17,9 @@ def create_user(db: Session, user: UserBaseDto):
         first_name=user.first_name,
         last_name=user.last_name,
         email=user.email,
-        phone_number=user.phone_number,
         normalized_email=normalized_email,
-        time_zone=user.time_zone
+        time_zone=user.time_zone,
+        locale=user.locale
     )
     db.add(db_user)
     db.commit()

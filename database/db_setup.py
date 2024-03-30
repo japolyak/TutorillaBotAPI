@@ -6,13 +6,13 @@ from .mockdata import insert_mock_data
 from config import db_username as username, db_password, db_host, db_port, db_name, db_initialized, is_development
 
 
-DATABASE_URL = f"postgresql+psycopg2://{username}:{db_password}@{db_host}:{db_port}/{db_name}"
+database_url = f"postgresql+psycopg2://{username}:{db_password}@{db_host}:{db_port}/{db_name}"
 
-if not database_exists(DATABASE_URL):
-    create_database(DATABASE_URL)
+if not database_exists(database_url):
+    create_database(database_url)
     db_initialized = True
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(database_url, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

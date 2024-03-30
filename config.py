@@ -1,8 +1,12 @@
 import os
 
+# App
 allowed_origins = os.getenv("ALLOWED_ORIGINS") or ''
+
+# Telegram
 bot_token = os.getenv("BOT_TOKEN") or ''
-my_tg_id = os.getenv("MY_TG_ID") or ''
+my_tg_id = int(os.getenv("MY_TG_ID") or 0)
+admin_tg_id = int(os.getenv("ADMIN_TG_ID") or 0)
 
 # Database
 is_development = bool(os.getenv("IS_DEVELOPMENT"))
