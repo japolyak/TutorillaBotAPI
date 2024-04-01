@@ -9,7 +9,7 @@ my_tg_id = int(os.getenv("MY_TG_ID") or 0)
 admin_tg_id = int(os.getenv("ADMIN_TG_ID") or 0)
 
 # Database
-is_development = os.getenv("IS_DEVELOPMENT") == "True"
+is_development = bool(os.getenv("IS_DEVELOPMENT"))
 db_username = os.getenv(f"DB_USER")
 db_password = os.getenv(f"DB_PASSWORD")
 db_host = os.getenv(f"DB_HOST")
