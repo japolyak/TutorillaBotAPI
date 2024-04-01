@@ -1,10 +1,11 @@
 from sqlalchemy.orm import Session
 from database.models import TutorCourse, Subject
+from routes.schemas import NewTutorCourseDto
 
 
-def add_course(db: Session, user_id: int, subject_id: int):
-    # TODO - remake with price from the request
-    db_course = TutorCourse(tutor_id=user_id, subject_id=subject_id, price=15)
+def add_course(db: Session, user_id: int, course: NewTutorCourseDto):
+
+    db_course = TutorCourse(tutor_id=user_id, subject_id=course.subject_id, price=course.price)
     db.add(db_course)
     db.commit()
     db.refresh(db_course)

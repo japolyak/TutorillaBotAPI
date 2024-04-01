@@ -9,7 +9,6 @@ def get_user(db: Session, user_id: int):
 
 
 def create_user(db: Session, user: UserBaseDto):
-    print(user.locale)
     normalized_email = user.email.lower()
 
     db_user = User(

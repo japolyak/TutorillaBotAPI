@@ -18,7 +18,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.post(path="/", status_code=status.HTTP_201_CREATED, response_model=UserDto)
-async def create_user(user: UserBaseDto, db: Session = Depends(get_db)):
+async def signup_user(user: UserBaseDto, db: Session = Depends(get_db)):
     db_user = user_crud.get_user(db=db, user_id=user.id)
     if db_user:
         raise HTTPException(status_code=400, detail="User already registered")
@@ -28,7 +28,7 @@ async def create_user(user: UserBaseDto, db: Session = Depends(get_db)):
 
 
 @router.post(path="/{user_id}/apply-role/{role}/", status_code=status.HTTP_201_CREATED)
-async def apply_student_role(user_id: int, role: str, db: Session = Depends(get_db)):
+async def apply_for_role(user_id: int, role: str, db: Session = Depends(get_db)):
     """
     Applies role to user
     """

@@ -113,3 +113,11 @@ class PrivateClassDto(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class NewTutorCourseDto(BaseModel):
+    subject_id: int
+    price: int
+
+    class Config:
+        from_attributes = True
