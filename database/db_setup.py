@@ -4,6 +4,7 @@ from database.models import Base
 from sqlalchemy.orm import sessionmaker
 from .mockdata import insert_mock_data
 from config import db_username as username, db_password, db_host, db_port, db_name, db_initialized, is_development
+import logging
 
 
 database_url = f"postgresql+psycopg2://{username}:{db_password}@{db_host}:{db_port}/{db_name}"
@@ -20,11 +21,14 @@ def init_db():
     try:
         global db_initialized
         Base.metadata.create_all(bind=engine)
+        logging.log(logging.INFO, "Database tables created")
 
         if db_initialized and is_development:
             insert_mock_data(engine)
+            logging.log(logging.INFO, "Mock data inserted")
             db_initialized = False
-    except:
+    except Exception as e:
+        logging.exception(f"Error while initializing db: {e}")
         pass
 
 

@@ -43,17 +43,17 @@ def insert_mock_data(engine: Engine):
         polish = Subject(name="Polish")
         english = Subject(name="English")
 
-        tutor_course1 = TutorCourse(tutor_id=1, subject_id=1, price=10)
-        tutor_course2 = TutorCourse(tutor_id=2, subject_id=2, price=10)
-        tutor_course3 = TutorCourse(tutor_id=3, subject_id=2, price=10)
-        tutor_course4 = TutorCourse(tutor_id=my_tg_id, subject_id=2, price=10)
+        tutor_course1 = TutorCourse(tutor_id=user1.id, subject_id=polish.id, price=10)
+        tutor_course2 = TutorCourse(tutor_id=user2.id, subject_id=english.id, price=10)
+        tutor_course3 = TutorCourse(tutor_id=user3.id, subject_id=english.id, price=10)
+        tutor_course4 = TutorCourse(tutor_id=my_tg_id, subject_id=english.id, price=10)
 
-        private_course1 = PrivateCourse(student_id=4, course_id=4, price=10)
-        private_course2 = PrivateCourse(student_id=5, course_id=4, price=10)
-        private_course3 = PrivateCourse(student_id=6, course_id=4, price=10)
-        private_course4 = PrivateCourse(student_id=my_tg_id, course_id=1, price=10)
-        private_course5 = PrivateCourse(student_id=my_tg_id, course_id=2, price=10)
-        private_course6 = PrivateCourse(student_id=my_tg_id, course_id=3, price=10)
+        private_course1 = PrivateCourse(student_id=user4.id, course_id=tutor_course4.id, price=10)
+        private_course2 = PrivateCourse(student_id=user5.id, course_id=tutor_course4.id, price=10)
+        private_course3 = PrivateCourse(student_id=user6.id, course_id=tutor_course4.id, price=10)
+        private_course4 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course1.id, price=10)
+        private_course5 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course2.id, price=10)
+        private_course6 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course3.id, price=10)
 
         source_one = SourceDto(title="Assignment 1", assignment="Do this").model_dump_json()
         source_two = SourceDto(title="Assignment 2", assignment="Do this again").model_dump_json()
@@ -62,12 +62,12 @@ def insert_mock_data(engine: Engine):
             "sources": [source_one, source_two]
         }
 
-        private_class1 = PrivateClass(private_course_id=1, schedule_datetime="2021-06-01 12:00:00", assignment=assignments)
-        private_class2 = PrivateClass(private_course_id=1, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
-        private_class3 = PrivateClass(private_course_id=1, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True, is_paid=True)
-        private_class4 = PrivateClass(private_course_id=2, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
-        private_class5 = PrivateClass(private_course_id=4, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True)
-        private_class6 = PrivateClass(private_course_id=4, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
+        private_class1 = PrivateClass(private_course_id=private_course1.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments)
+        private_class2 = PrivateClass(private_course_id=private_course1.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
+        private_class3 = PrivateClass(private_course_id=private_course1.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True, is_paid=True)
+        private_class4 = PrivateClass(private_course_id=private_course2.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
+        private_class5 = PrivateClass(private_course_id=private_course4.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True)
+        private_class6 = PrivateClass(private_course_id=private_course4.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
 
         session.add_all([user1, user2, user3, user4, user5, user6, artem, admin])
         session.add_all([polish, english])
