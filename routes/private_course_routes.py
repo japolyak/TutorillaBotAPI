@@ -66,7 +66,7 @@ async def get_private_courses(user_id: int, private_course_id: int, db: Session 
 
 
 @router.post(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_201_CREATED,
-                response_model=PrivateCourseDto, description="Enroll student to course")
+             response_model=PrivateCourseDto, description="Enroll student to course")
 async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(get_db)):
     db_course = private_courses_crud.enroll_student_to_course(db=db, user_id=user_id, course_id=private_course_id)
     return db_course
@@ -78,6 +78,8 @@ async def add_new_class(course_id: int, new_class: NewClassDto, db: Session = De
     """
     Adds new class for private course from telegram web app
     """
+    # TODO - implement correct time saving
+    # schedule = transform_class_time(new_class, role)
     schedule = new_class.date
     assignment = {
         "sources": [source.model_dump_json() for source in new_class.sources]
