@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from database.db_setup import get_db
 from functions.time_transformator import transform_class_time
 from database.crud import private_courses_crud
+import logging
 
 router = APIRouter()
 
@@ -78,6 +79,8 @@ async def add_new_class(course_id: int, new_class: NewClassDto, db: Session = De
     """
     Adds new class for private course from telegram web app
     """
+    print(new_class.date)
+    logging.log(f"New class: {new_class.date}")
     # TODO - implement correct time saving
     # schedule = transform_class_time(new_class, role)
     schedule = new_class.date
@@ -85,6 +88,6 @@ async def add_new_class(course_id: int, new_class: NewClassDto, db: Session = De
         "sources": [source.model_dump_json() for source in new_class.sources]
     }
 
-    private_courses_crud.schedule_class(db=db, course_id=course_id, schedule=schedule, assignment=assignment)
+    # private_courses_crud.schedule_class(db=db, course_id=course_id, schedule=schedule, assignment=assignment)
 
     return status.HTTP_201_CREATED
