@@ -15,8 +15,9 @@ async def get_classes(course_id: int, role: str, page: int, db: Session = Depend
     if role not in ["tutor", "student"]:
         raise HTTPException(status_code=400)
 
-    db_classes, count = private_courses_crud.get_private_course_classes(db=db, course_id=course_id, page=page)
-    pages = 1 + count // 5
+    items_per_page = 5
+    db_classes, count = private_courses_crud.get_private_course_classes(db, items_per_page, course_id, page)
+    pages = 1 + count // items_per_page
 
     private_course_dto = None
     classes: list[PrivateClassBaseDto] = []
@@ -78,8 +79,6 @@ async def add_new_class(course_id: int, new_class: NewClassDto, db: Session = De
     """
     Adds new class for private course from telegram web app
     """
-    # TODO - implement correct time saving
-    # schedule = transform_class_time(new_class, role)
     schedule = new_class.date
     assignment = {
         "sources": [source.model_dump_json() for source in new_class.sources]

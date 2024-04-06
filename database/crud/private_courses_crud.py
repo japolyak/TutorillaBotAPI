@@ -6,14 +6,14 @@ import json
 from datetime import datetime
 
 
-def get_private_course_classes(db: Session, course_id: int, page: int = 1, per_page: int = 3):
-    offset = (page - 1) * per_page
+def get_private_course_classes(db: Session, items_per_page: int, course_id: int, page: int = 1):
+    offset = (page - 1) * items_per_page
     db_classes = (
         db.query(PrivateClass)
         .order_by(asc(PrivateClass.schedule_datetime))
         .filter(PrivateClass.private_course_id == course_id)
         .offset(offset)
-        .limit(per_page)
+        .limit(items_per_page)
         .all()
     )
     total = (
