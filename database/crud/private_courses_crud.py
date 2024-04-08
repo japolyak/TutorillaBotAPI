@@ -1,6 +1,6 @@
 from database.models import TutorCourse, Subject, PrivateCourse
 from sqlalchemy import asc, func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from database.models import PrivateClass
 import json
 from datetime import datetime
@@ -46,9 +46,16 @@ def get_private_courses(db: Session, user_id: int, subject_name: str, role: str)
     return db_courses
 
 
-# TODO - Consider rewriting this function
-def get_tutor_private_course(db: Session, user_id: int, private_course_id: int):
-    db_course = db.query(PrivateCourse).filter(PrivateCourse.id == private_course_id).first()
+def get_private_course_by_course_id(db: Session, private_course_id: int):
+    db_course = (
+        db.query(PrivateCourse)
+        .options(
+            joinedload(PrivateCourse.student),
+                  joinedload(PrivateCourse.course).joinedload(TutorCourse.tutor),
+                  joinedload(PrivateCourse.course).joinedload(TutorCourse.subject))
+        .filter(PrivateCourse.id == private_course_id)
+        .first()
+    )
 
     return db_course
 
