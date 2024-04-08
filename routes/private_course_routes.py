@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from database.db_setup import get_db
 from functions.time_transformator import transform_class_time
 from database.crud import private_courses_crud
-import datetime
+import logging
 
 
 router = APIRouter()
@@ -83,6 +83,7 @@ async def add_new_class(private_course_id: int, role: str, new_class: NewClassDt
     """
     Adds new class for private course from telegram web app
     """
+    logging.log(logging.INFO, f"date before save {new_class.date}")
     schedule = new_class.date
     assignment = {
         "sources": [source.model_dump_json() for source in new_class.sources]
@@ -97,14 +98,14 @@ async def add_new_class(private_course_id: int, role: str, new_class: NewClassDt
 
         sender_name = private_course.course.tutor.first_name
 
-        test_baba = transform_class_time(private_course, new_class.date, "tutor").strftime('%H:%M %d-%m-%Y')
+        class_date = transform_class_time(private_course, new_class.date, "tutor").strftime('%H:%M %d-%m-%Y')
     else:
         recipient_id = private_course.course.tutor.id
 
         sender_name = private_course.student.first_name
 
-        test_baba = transform_class_time(private_course, new_class.date, "student").strftime('%H:%M %d-%m-%Y')
+        class_date = transform_class_time(private_course, new_class.date, "student").strftime('%H:%M %d-%m-%Y')
 
-    send_notification_about_new_class(recipient_id, sender_name, private_course.course.subject.name, test_baba)
+    send_notification_about_new_class(recipient_id, sender_name, private_course.course.subject.name, class_date)
 
     return private_course
