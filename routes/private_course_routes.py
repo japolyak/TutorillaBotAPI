@@ -93,18 +93,18 @@ async def add_new_class(private_course_id: int, role: str, new_class: NewClassDt
     private_course = private_courses_crud.get_private_course_by_course_id(db, private_course_id)
 
     if role == "tutor":
-        sender_id = private_course.course.tutor.id
+        recipient_id = private_course.student.id
 
-        recipient_name = private_course.student.first_name
+        sender_name = private_course.course.tutor.first_name
 
         test_baba = transform_class_time(private_course, new_class.date, "tutor").strftime('%H:%M %d-%m-%Y')
     else:
-        sender_id = private_course.student.id
+        recipient_id = private_course.course.tutor.id
 
-        recipient_name = private_course.course.tutor.first_name
+        sender_name = private_course.student.first_name
 
         test_baba = transform_class_time(private_course, new_class.date, "student").strftime('%H:%M %d-%m-%Y')
 
-    send_notification_about_new_class(sender_id, recipient_name, private_course.course.subject.name, test_baba)
+    send_notification_about_new_class(recipient_id, sender_name, private_course.course.subject.name, test_baba)
 
     return private_course
