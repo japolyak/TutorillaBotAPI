@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Generic, TypeVar
 from datetime import datetime
+from enum import  StrEnum
 
 T = TypeVar('T')
 
@@ -118,6 +119,20 @@ class PrivateClassDto(BaseModel):
 class NewTutorCourseDto(BaseModel):
     subject_id: int
     price: int
+
+    class Config:
+        from_attributes = True
+
+
+class ClassStatus(StrEnum):
+    Scheduled = 'scheduled'
+    Occurred = 'occurred'
+    Paid = 'paid'
+
+
+class ClassDto(BaseModel):
+    date: datetime
+    status: ClassStatus
 
     class Config:
         from_attributes = True

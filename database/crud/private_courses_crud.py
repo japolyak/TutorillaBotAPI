@@ -25,6 +25,23 @@ def get_private_course_classes(db: Session, items_per_page: int, course_id: int,
     return db_classes, total
 
 
+def get_private_course_classes_for_month(db: Session, course_id: int, month: int, year: int):
+    start_date = datetime(year, month - 1, 25)
+    finish_date = datetime(year, month + 1, 5)
+
+    db_classes = (
+        db.query(PrivateClass)
+        .filter(
+            PrivateClass.private_course_id == course_id,
+            PrivateClass.schedule_datetime >= start_date,
+            PrivateClass.schedule_datetime <= finish_date
+        )
+        .all()
+    )
+
+    return db_classes
+
+
 def get_private_courses(db: Session, user_id: int, subject_name: str, role: str):
     if role == "tutor":
         db_courses = (

@@ -1,7 +1,7 @@
 from fastapi import status, APIRouter, Depends, HTTPException
 import json
 from bot_client.message_sender import send_notification_about_new_class
-from .schemas import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto
+from .schemas import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, ClassStatus
 from sqlalchemy.orm import Session
 from database.db_setup import get_db
 from functions.time_transformator import transform_class_time
@@ -17,7 +17,7 @@ async def get_classes(course_id: int, role: str, page: int, db: Session = Depend
     if role not in ["tutor", "student"]:
         raise HTTPException(status_code=400)
 
-    items_per_page = 5
+    items_per_page = 3
     db_classes, count = private_courses_crud.get_private_course_classes(db, items_per_page, course_id, page)
     pages = 1 + count // items_per_page
 
@@ -48,6 +48,34 @@ async def get_classes(course_id: int, role: str, page: int, db: Session = Depend
                                                                                     current_page=page, pages=pages)
 
     return result
+
+
+@router.get(path="/{private_course_id}/classes/month/{month}/year/{year}/", status_code=status.HTTP_200_OK,
+            response_model=list[ClassDto], description="Get classes of the course for specific month")
+async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(get_db)):
+    db_private_course = private_courses_crud.get_private_course_by_course_id(db=db, private_course_id=private_course_id)
+
+    if not db_private_course:
+        raise HTTPException(status_code=404, detail="Private course not found")
+
+    db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
+
+    if not db_classes:
+        return []
+
+    response_model: list[ClassDto] = []
+
+    for db_class in db_classes:
+        if db_class.is_paid:
+            class_dto = ClassDto(date=db_class.schedule_datetime, status=ClassStatus.Paid)
+        elif db_class.has_occurred:
+            class_dto = ClassDto(date=db_class.schedule_datetime, status=ClassStatus.Occurred)
+        else:
+            class_dto = ClassDto(date=db_class.schedule_datetime, status=ClassStatus.Scheduled)
+
+        response_model.append(class_dto)
+
+    return response_model
 
 
 @router.get(path="/users/{user_id}/subjects/{subject_name}/", status_code=status.HTTP_200_OK,
