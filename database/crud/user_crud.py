@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from database.models import User, UserRequest
-from routes.schemas import UserBaseDto
+from routes.data_transfer_models import UserBaseDto
 from datetime import datetime
 
 

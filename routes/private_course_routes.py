@@ -1,22 +1,21 @@
-from fastapi import status, APIRouter, Depends, HTTPException
+from fastapi import status, APIRouter, Depends, Response
 import json
+from typing import Literal
 from bot_client.message_sender import send_notification_about_new_class
-from .schemas import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, ClassStatus
+from routes.data_transfer_models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, ClassStatus, Role
 from sqlalchemy.orm import Session
-from database.db_setup import get_db
+from database.db_setup import session
 from functions.time_transformator import transform_class_time
 from database.crud import private_courses_crud
-
+from routes.sql_statement_repository import sql_statements
+from datetime import timezone, timedelta
 
 router = APIRouter()
 
 
 @router.get(path="/{course_id}/classes/", status_code=status.HTTP_200_OK,
             response_model=PaginatedList, description="Get classes of the course")
-async def get_classes(course_id: int, role: str, page: int, db: Session = Depends(get_db)):
-    if role not in ["tutor", "student"]:
-        raise HTTPException(status_code=400)
-
+async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], page: int, db: Session = Depends(session)):
     items_per_page = 3
     db_classes, count = private_courses_crud.get_private_course_classes(db, items_per_page, course_id, page)
     pages = 1 + count // items_per_page
@@ -31,7 +30,6 @@ async def get_classes(course_id: int, role: str, page: int, db: Session = Depend
         sources = [SourceDto(**json.loads(item)) for item in db_class.assignment.get('sources', [])]
 
         new_time = transform_class_time(db_class.private_course, db_class.schedule_datetime, role)
-        print(new_time)
 
         class_dto = PrivateClassBaseDto(
             id=db_class.id,
@@ -52,11 +50,11 @@ async def get_classes(course_id: int, role: str, page: int, db: Session = Depend
 
 @router.get(path="/{private_course_id}/classes/month/{month}/year/{year}/", status_code=status.HTTP_200_OK,
             response_model=list[ClassDto], description="Get classes of the course for specific month")
-async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(get_db)):
+async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(session)):
     db_private_course = private_courses_crud.get_private_course_by_course_id(db=db, private_course_id=private_course_id)
 
     if not db_private_course:
-        raise HTTPException(status_code=404, detail="Private course not found")
+        return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
     db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
 
@@ -80,7 +78,7 @@ async def get_classes_by_date(private_course_id: int, month: int, year: int, db:
 
 @router.get(path="/users/{user_id}/subjects/{subject_name}/", status_code=status.HTTP_200_OK,
             response_model=list[PrivateCourseDto], description="Get private courses")
-async def get_private_courses(user_id: int, subject_name: str, role: str, db: Session = Depends(get_db)):
+async def get_private_courses(user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student], db: Session = Depends(session)):
     db_private_courses = private_courses_crud.get_private_courses(db=db, user_id=user_id, subject_name=subject_name, role=role)
 
     return db_private_courses
@@ -88,25 +86,25 @@ async def get_private_courses(user_id: int, subject_name: str, role: str, db: Se
 
 @router.get(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_200_OK,
             description="Get private courses")
-async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(get_db)):
+async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(session)):
     db_private_course = private_courses_crud.get_private_course_by_course_id(db=db, private_course_id=private_course_id)
 
     if not db_private_course:
-        raise HTTPException(status_code=404, detail="Private course not found")
+        return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
     return status.HTTP_200_OK
 
 
 @router.post(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_201_CREATED,
              response_model=PrivateCourseDto, description="Enroll student to course")
-async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(get_db)):
+async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(session)):
     db_course = private_courses_crud.enroll_student_to_course(db=db, user_id=user_id, course_id=private_course_id)
     return db_course
 
 
 @router.post(path="/{private_course_id}/new-class/{role}/", status_code=status.HTTP_201_CREATED,
-             description="Add new class for private course")
-async def add_new_class(private_course_id: int, role: str, new_class: NewClassDto, db: Session = Depends(get_db)):
+             description="Add new class for private course", summary="Add new class for private course")
+async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.Student], new_class: NewClassDto, db: Session = Depends(session)):
     """
     Adds new class for private course from telegram web app
     """
@@ -115,23 +113,33 @@ async def add_new_class(private_course_id: int, role: str, new_class: NewClassDt
         "sources": [source.model_dump_json() for source in new_class.sources]
     }
 
-    private_courses_crud.schedule_class(db=db, course_id=private_course_id, schedule=schedule, assignment=assignment)
+    params = {
+        'pc_id': private_course_id,
+        'sender_role': role,
+        'sc_schedule_datetime': schedule,
+        'sc_assignment': json.dumps(assignment),
+        'recipient_id': None,
+        'recipient_timezone': None,
+        'sender_name': None,
+        'subject_name': None,
+        'error': None
+    }
 
-    private_course = private_courses_crud.get_private_course_by_course_id(db, private_course_id)
+    result = db.execute(sql_statements.schedule_class_and_get_course, params)
 
-    if role == "tutor":
-        recipient_id = private_course.student.id
+    result_row = result.fetchall()[0]
 
-        sender_name = private_course.course.tutor.first_name
+    db.commit()
+    db.close()
+    recipient_id, recipient_timezone, sender_name, subject_name, error_msg = result_row
 
-        class_date = transform_class_time(private_course, schedule, "tutor").strftime('%H:%M %d-%m-%Y')
-    else:
-        recipient_id = private_course.course.tutor.id
+    if error_msg:
+        return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
-        sender_name = private_course.student.first_name
+    new_timezone = timezone(timedelta(hours=recipient_timezone))
 
-        class_date = transform_class_time(private_course, schedule, "student").strftime('%H:%M %d-%m-%Y')
+    class_date = schedule.astimezone(new_timezone).strftime('%H:%M %d-%m-%Y')
 
-    send_notification_about_new_class(recipient_id, sender_name, private_course.course.subject.name, class_date)
+    send_notification_about_new_class(recipient_id, sender_name, subject_name, class_date)
 
-    return private_course
+    return Response(status_code=status.HTTP_201_CREATED)

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Engine
 from sqlalchemy_utils import database_exists, create_database
 from database.models import Base
 from sqlalchemy.orm import sessionmaker
@@ -32,9 +32,13 @@ def init_db():
         pass
 
 
-def get_db():
+def session():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
+
+def cursor():
+    return engine.raw_connection().cursor()

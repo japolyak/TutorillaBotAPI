@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import Engine
-from .models import User, Subject, TutorCourse, PrivateCourse, PrivateClass
-from routes.schemas import SourceDto
+from database.models import User, Subject, TutorCourse, PrivateCourse, PrivateClass
+from routes.data_transfer_models import SourceDto
 from config import my_tg_id, admin_tg_id
 
 
