@@ -1,9 +1,10 @@
-from fastapi import status, Depends, HTTPException, APIRouter
+from fastapi import status, Depends, HTTPException, APIRouter, Response
 from .schemas import UserDto, UserBaseDto
 from database.crud import user_crud
 from sqlalchemy.orm import Session
-from database.db_setup import get_db
-
+from sqlalchemy import func, text
+from database.db_setup import session, cursor
+import logging
 
 router = APIRouter()
 
@@ -16,15 +17,26 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
     print(db_user)
     return db_user
 
+@router.post(path="/", status_code=status.HTTP_201_CREATED)
+async def add_user(user: UserBaseDto, db: Session = Depends(session)):
+    stmnt = text("CALL add_user(:u_id, :u_first_name, :u_last_name, :u_email, :u_normalized_email, :u_time_zone, :u_locale, :error)")
+    params = {'u_id': user.id, 'u_first_name': user.first_name, 'u_last_name': user.last_name, 'u_email': user.email, 'u_normalized_email': user.email.lower(), 'u_time_zone': user.time_zone, 'u_locale': user.locale, 'error': None}
 
-@router.post(path="/", status_code=status.HTTP_201_CREATED, response_model=UserDto)
-async def signup_user(user: UserBaseDto, db: Session = Depends(get_db)):
-    db_user = user_crud.get_user(db=db, user_id=user.id)
-    if db_user:
-        raise HTTPException(status_code=400, detail="User already registered")
+    result = db.execute(stmnt, params)
 
     new_user = user_crud.create_user(db, user=user)
     return new_user
+    error_msg = result.fetchall()[0][0]
+
+    db.commit()
+    db.close()
+
+    if not error_msg:
+        return Response(status_code=status.HTTP_201_CREATED)
+
+    logging.error(error_msg)
+
+    return Response("User Already exists", status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @router.post(path="/{user_id}/apply-role/{role}/", status_code=status.HTTP_201_CREATED)
