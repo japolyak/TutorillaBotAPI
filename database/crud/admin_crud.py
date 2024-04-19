@@ -13,7 +13,6 @@ def get_users_requests(db: Session, role: str):
 
 
 def get_user_request(db: Session, role_request_id: int):
-    print(role_request_id)
     db_user_request = db.query(UserRequest).filter(UserRequest.id == role_request_id).first()
 
     return db_user_request

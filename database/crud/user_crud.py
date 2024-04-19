@@ -1,63 +1,9 @@
 from sqlalchemy.orm import Session
 from database.models import User, UserRequest
-from routes.data_transfer_models import UserBaseDto
-from datetime import datetime
 
 
 def get_user(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
-
-
-def create_user(db: Session, user: UserBaseDto):
-    normalized_email = user.email.lower()
-
-    db_user = User(
-        id=user.id,
-        first_name=user.first_name,
-        last_name=user.last_name,
-        email=user.email,
-        normalized_email=normalized_email,
-        time_zone=user.time_zone,
-        locale=user.locale
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
-
-def apply_tutor_role(db: Session, user):
-    db_user_request = UserRequest(
-        user_id=user.id,
-        request_datetime=datetime.now(),
-        tutor_role=True
-    )
-
-    db.add(db_user_request)
-    db.commit()
-    db.refresh(db_user_request)
-    return db_user_request
-
-
-# def apply_student_role(db: Session, user_id: int):
-#     db_user = db.query(User).filter(User.id == user_id).first()
-#     db_user.is_student = True
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user
-
-
-def apply_student_role(db: Session, user):
-    db_user_request = UserRequest(
-        user_id=user.id,
-        request_datetime=datetime.now(),
-        student_role=True
-    )
-
-    db.add(db_user_request)
-    db.commit()
-    db.refresh(db_user_request)
-    return db_user_request
 
 
 def accept_role_request(db: Session, user_id: int, role: str):
