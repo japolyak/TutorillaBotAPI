@@ -14,11 +14,11 @@ def add_course(db: Session, user_id: int, course: NewTutorCourseDto):
 
 
 def get_available_courses_by_subject(db: Session, user_id: int, subject_name: str):
-    db_available_courses = (
+    query = (
         db.query(TutorCourse)
         .join(TutorCourse.subject)
         .filter(Subject.name == subject_name, TutorCourse.is_active, TutorCourse.tutor_id != user_id)
-        .all()
+
     )
 
-    return db_available_courses
+    return query.all()

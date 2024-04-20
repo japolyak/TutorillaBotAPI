@@ -1,12 +1,16 @@
 from sqlalchemy.orm import Session
 from database.models import User, UserRequest
+from typing import Literal
+from routes.data_transfer_models import Role
 
 
 def get_user(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+    query = db.query(User).filter(User.id == user_id)
+
+    return query.first()
 
 
-def accept_role_request(db: Session, user_id: int, role: str):
+def accept_role_request(db: Session, user_id: int, role: Literal[Role.Tutor, Role.Student]):
     db_user_request = db.query(UserRequest).filter(UserRequest.user_id == user_id).first()
 
     if db_user_request is None:
@@ -17,9 +21,9 @@ def accept_role_request(db: Session, user_id: int, role: str):
     if not db_user:
         return None
 
-    if role == "student":
+    if role == Role.Student:
         db_user.is_student = True
-    elif role == "tutor":
+    elif role == Role.Tutor:
         db_user.is_tutor = True
 
     db_user.is_active = True

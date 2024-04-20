@@ -1,18 +1,21 @@
-from datetime import datetime
-from sqlalchemy import desc
 from sqlalchemy.orm import Session
 from database.models import UserRequest
+from typing import Literal
+from routes.data_transfer_models import Role
 
 
-def get_users_requests(db: Session, role: str):
-    if role == "tutor":
-        return db.query(UserRequest).filter(UserRequest.tutor_role).all()
+def get_users_requests(db: Session, role: Literal[Role.Tutor, Role.Student]):
+    query = db.query(UserRequest)
 
-    if role == "student":
-        return db.query(UserRequest).filter(UserRequest.student_role).all()
+    if role == Role.Tutor:
+        query = query.filter(UserRequest.tutor_role)
+    else:
+        query = query.filter(UserRequest.student_role)
+
+    return query.all()
 
 
 def get_user_request(db: Session, role_request_id: int):
-    db_user_request = db.query(UserRequest).filter(UserRequest.id == role_request_id).first()
+    query = db.query(UserRequest).filter(UserRequest.id == role_request_id)
 
-    return db_user_request
+    return query.first()
