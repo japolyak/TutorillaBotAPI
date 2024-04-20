@@ -20,9 +20,6 @@ async def get_user(user_id: int, db: Session = Depends(session)):
     if db_user is None:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'message': 'User was not found'})
 
-    # user = UserDto.from_orm(db_user).model_dump_json()
-    # return Response(user, status.HTTP_200_OK, media_type='application/json')
-
     user = jsonable_encoder(db_user)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=user)
