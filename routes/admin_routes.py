@@ -41,7 +41,7 @@ async def get_requests(role_request_id: int, db: Session = Depends(session)):
 
 @router.put(path="/users/{user_id}/accept-role/{role}/", status_code=status.HTTP_200_OK, response_model=UserDto,
             summary="Accept user role request")
-async def accept_student_role(user_id: int, role: Literal[Role.Student], db: Session = Depends(session)):
+async def accept_role(user_id: int, role: Literal[Role.Student], db: Session = Depends(session)):
     # TODO - rewrite
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
