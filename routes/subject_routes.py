@@ -3,9 +3,8 @@ from .data_transfer_models import SubjectDto, Role
 from sqlalchemy.orm import Session
 from database.db_setup import session
 from database.crud import subject_crud
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
 from typing import Literal
+from builders.response_builder import ResponseBuilder
 
 
 router = APIRouter()
@@ -19,8 +18,11 @@ async def get_subjects(user_id: int, is_available: bool, role: Literal[Role.Stud
         Role.Tutor: subject_crud.get_tutor_subjects
     }
 
-    subjects_function = role_to_function.get(role)
+    subjects_func = role_to_function.get(role)
 
-    subjects = jsonable_encoder(subjects_function(db, user_id, is_available))
+    response_models = subjects_func(db, user_id, is_available)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=subjects)
+    if not response_models:
+        return ResponseBuilder.success_response(content=[])
+
+    return ResponseBuilder.success_response(content=response_models)

@@ -1,6 +1,4 @@
-from fastapi import status, Depends, APIRouter, Response
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi import status, Depends, APIRouter
 from routes.data_transfer_models import UserDto, UserBaseDto, Role
 from database.crud import user_crud
 from sqlalchemy.orm import Session
@@ -8,6 +6,7 @@ from database.db_setup import session
 from routes.sql_statement_repository import sql_statements
 from datetime import datetime
 from typing import Literal
+from builders.response_builder import ResponseBuilder
 
 
 router = APIRouter()
@@ -18,11 +17,9 @@ async def get_user(user_id: int, db: Session = Depends(session)):
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
     if db_user is None:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'message': 'User was not found'})
+        return ResponseBuilder.error_response(message='User was not found')
 
-    user = jsonable_encoder(db_user)
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=user)
+    return ResponseBuilder.success_response(content=db_user)
 
 
 @router.post(path="/", status_code=status.HTTP_201_CREATED, summary="Adds a new user")
@@ -45,10 +42,9 @@ async def add_user(user: UserBaseDto, db: Session = Depends(session)):
     db.commit()
     db.close()
 
-    if not error_msg:
-        return Response(status_code=status.HTTP_201_CREATED)
-
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'message': 'User addition was not successful'})
+    return ResponseBuilder.success_response(status.HTTP_201_CREATED)\
+        if not error_msg\
+        else ResponseBuilder.error_response(message='User addition was not successful')
 
 
 @router.post(path="/{user_id}/apply-role/{role}/", status_code=status.HTTP_201_CREATED)
@@ -69,6 +65,6 @@ async def apply_for_role(user_id: int, role: Literal[Role.Student, Role.Tutor], 
     db.close()
 
     if error_msg is not None:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'message': 'Role application was not successful'})
+        return ResponseBuilder.error_response(message='Role application was not successful')
 
-    return Response(status_code=status.HTTP_201_CREATED)
+    return ResponseBuilder.success_response(status.HTTP_201_CREATED)

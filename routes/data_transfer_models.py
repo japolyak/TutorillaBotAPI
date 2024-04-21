@@ -75,6 +75,16 @@ class TutorCourseDto(BaseModel):
         from_attributes = True
 
 
+class TutorCourseInlineDto(BaseModel):
+    id: int
+    tutor_name: str
+    subject_name: str
+    price: int
+
+    class Config:
+        from_attributes = True
+
+
 class PrivateCourseDto(BaseModel):
     id: int
     student: UserDto

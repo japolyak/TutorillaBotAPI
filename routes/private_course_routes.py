@@ -1,4 +1,4 @@
-from fastapi import status, APIRouter, Depends, Response
+from fastapi import status, APIRouter, Depends
 import json
 from typing import Literal
 from bot_client.message_sender import send_notification_about_new_class
@@ -9,8 +9,8 @@ from functions.time_transformator import transform_class_time
 from database.crud import private_courses_crud
 from routes.sql_statement_repository import sql_statements
 from datetime import timezone, timedelta
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from builders.response_builder import ResponseBuilder
+
 
 router = APIRouter()
 
@@ -45,11 +45,10 @@ async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], p
         )
         classes.append(class_dto)
 
-    result: PaginatedList[PrivateClassBaseDto] = PaginatedList[PrivateClassBaseDto](items=classes, total=count,
+    response_model: PaginatedList[PrivateClassBaseDto] = PaginatedList[PrivateClassBaseDto](items=classes, total=count,
                                                                                     current_page=page, pages=pages)
-    pg_list = jsonable_encoder(result)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=pg_list)
+    return ResponseBuilder.success_response(content=response_model)
 
 
 @router.get(path="/{private_course_id}/classes/month/{month}/year/{year}/", status_code=status.HTTP_200_OK,
@@ -58,13 +57,11 @@ async def get_classes_by_date(private_course_id: int, month: int, year: int, db:
     db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
 
     if not db_classes:
-        return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder([]))
+        return ResponseBuilder.success_response(content=[])
 
     response_models = [ClassDto(date=db_class[0], status=db_class[1]) for db_class in db_classes]
 
-    classes = jsonable_encoder(response_models)
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=classes)
+    return ResponseBuilder.success_response(content=response_models)
 
 
 @router.get(path="/users/{user_id}/subjects/{subject_name}/", status_code=status.HTTP_200_OK,
@@ -72,11 +69,12 @@ async def get_classes_by_date(private_course_id: int, month: int, year: int, db:
 async def get_private_courses(user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student], db: Session = Depends(session)):
     db_private_courses = private_courses_crud.get_private_courses(db, user_id, subject_name, role)
 
+    if not db_private_courses:
+        return ResponseBuilder.success_response(content=[])
+
     response_models = [PrivateCourseInlineDto(id=pc[0], person_name=pc[1], subject_name=pc[2]) for pc in db_private_courses]
 
-    private_courses = jsonable_encoder(response_models)
-
-    return JSONResponse(status_code=status.HTTP_200_OK, content=private_courses)
+    return ResponseBuilder.success_response(content=response_models)
 
 
 @router.post(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_201_CREATED,
@@ -84,7 +82,7 @@ async def get_private_courses(user_id: int, subject_name: str, role: Literal[Rol
 async def enroll_in_course(user_id: int, private_course_id: int, db: Session = Depends(session)):
     # TODO: Rewrite
     private_courses_crud.enroll_student_to_course(db=db, user_id=user_id, course_id=private_course_id)
-    return Response(status_code=status.HTTP_201_CREATED)
+    return ResponseBuilder.success_response(status.HTTP_201_CREATED)
 
 
 @router.post(path="/{private_course_id}/new-class/{role}/", status_code=status.HTTP_201_CREATED,
@@ -117,8 +115,7 @@ async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.S
     recipient_id, recipient_timezone, sender_name, subject_name, error_msg = result_row
 
     if error_msg:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
-                            content={'message': 'Class addition was not successful'})
+        return ResponseBuilder.error_response(message='Class addition was not successful')
 
     new_timezone = timezone(timedelta(hours=recipient_timezone))
 
@@ -126,4 +123,4 @@ async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.S
 
     send_notification_about_new_class(recipient_id, sender_name, subject_name, class_date)
 
-    return Response(status_code=status.HTTP_201_CREATED)
+    return ResponseBuilder.success_response(status.HTTP_201_CREATED)

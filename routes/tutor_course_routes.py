@@ -1,11 +1,9 @@
 from fastapi import status, APIRouter, Depends
-from routes.data_transfer_models import TutorCourseDto, NewTutorCourseDto
+from routes.data_transfer_models import TutorCourseDto, NewTutorCourseDto, TutorCourseInlineDto
 from database.crud import tutor_course_crud
 from sqlalchemy.orm import Session
 from database.db_setup import session
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-
+from builders.response_builder import ResponseBuilder
 
 router = APIRouter()
 
@@ -15,16 +13,17 @@ router = APIRouter()
 async def add_course(new_tutor_course: NewTutorCourseDto, user_id: int, db: Session = Depends(session)):
     # TODO - rewrite
     db_course = tutor_course_crud.add_course(db=db, user_id=user_id, course=new_tutor_course)
-    course = jsonable_encoder(db_course)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=course)
+    return ResponseBuilder.success_response(content=db_course)
 
 
 @router.get(path="/users/{user_id}/subject-name/{subject_name}/", status_code=status.HTTP_200_OK,
-            response_model=list[TutorCourseDto], description="Get available tutors")
-async def get_available_tutors(user_id: int, subject_name: str, db: Session = Depends(session)):
-    # TODO - rewrite
-    db_tutors = tutor_course_crud.get_available_courses_by_subject(db=db, user_id=user_id, subject_name=subject_name)
-    tutors = jsonable_encoder(db_tutors)
+            response_model=list[TutorCourseInlineDto], description="Get available tutors")
+async def get_available_tutor_courses(user_id: int, subject_name: str, db: Session = Depends(session)):
+    db_tutor_courses = tutor_course_crud.get_available_courses_by_subject(db=db, user_id=user_id, subject_name=subject_name)
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content=tutors)
+    response_models = [
+        TutorCourseInlineDto(id=tc[0], price=tc[1], subject_name=tc[3], tutor_name=tc[4]) for tc in db_tutor_courses
+    ]
+
+    return ResponseBuilder.success_response(content=response_models)
