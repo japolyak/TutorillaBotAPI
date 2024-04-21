@@ -6,12 +6,13 @@ from sqlalchemy.orm import Session
 from database.db_setup import session
 from typing import Literal
 from builders.response_builder import ResponseBuilder
+from routes.api_enpoints import APIEndpoints
 
 
-router = APIRouter()
+router = APIRouter(prefix=APIEndpoints.Admin.Prefix, tags=["admin"])
 
 
-@router.get(path="/role-requests/{role}/", status_code=status.HTTP_200_OK, response_model=list[UserRequestDto],
+@router.get(path=APIEndpoints.Admin.GetRequests, status_code=status.HTTP_200_OK, response_model=list[UserRequestDto],
             summary="Get all requests by role")
 async def get_requests(role: Literal[Role.Student], db: Session = Depends(session)):
     # TODO - rewrite
@@ -23,9 +24,9 @@ async def get_requests(role: Literal[Role.Student], db: Session = Depends(sessio
     return ResponseBuilder.success_response(content=response_models)
 
 
-@router.get(path="/user-requests/{role_request_id}/", status_code=status.HTTP_200_OK, response_model=UserRequestDto,
+@router.get(path=APIEndpoints.Admin.GetRequest, status_code=status.HTTP_200_OK, response_model=UserRequestDto,
             summary="Get request by request id")
-async def get_requests(role_request_id: int, db: Session = Depends(session)):
+async def get_request(role_request_id: int, db: Session = Depends(session)):
     # TODO - rewrite
     db_request = admin_crud.get_user_request(db=db, role_request_id=role_request_id)
 
@@ -35,7 +36,7 @@ async def get_requests(role_request_id: int, db: Session = Depends(session)):
     return ResponseBuilder.success_response(content=UserRequestDto.model_validate(db_request))
 
 
-@router.put(path="/users/{user_id}/accept-role/{role}/", status_code=status.HTTP_200_OK, response_model=UserDto,
+@router.put(path=APIEndpoints.Admin.AcceptRole, status_code=status.HTTP_200_OK, response_model=UserDto,
             summary="Accept user role request")
 async def accept_role(user_id: int, role: Literal[Role.Student], db: Session = Depends(session)):
     # TODO - rewrite
@@ -58,7 +59,7 @@ async def accept_role(user_id: int, role: Literal[Role.Student], db: Session = D
     return ResponseBuilder.success_response(content=response_model)
 
 
-@router.put(path="/users/{user_id}/decline-role/", status_code=status.HTTP_200_OK, summary="Decline user role request")
+@router.put(path=APIEndpoints.Admin.DeclineRole, status_code=status.HTTP_200_OK, summary="Decline user role request")
 async def decline_student_role(user_id: int, db: Session = Depends(session)):
     # TODO - rewrite
     db_user = user_crud.get_user(db=db, user_id=user_id)

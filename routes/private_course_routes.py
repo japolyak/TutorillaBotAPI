@@ -10,12 +10,13 @@ from database.crud import private_courses_crud
 from routes.sql_statement_repository import sql_statements
 from datetime import timezone, timedelta
 from builders.response_builder import ResponseBuilder
+from routes.api_enpoints import APIEndpoints
 
 
-router = APIRouter()
+router = APIRouter(prefix=APIEndpoints.PrivateCourses.Prefix, tags=["private-courses"])
 
 
-@router.get(path="/{course_id}/classes/", status_code=status.HTTP_200_OK, response_model=PaginatedList,
+@router.get(path=APIEndpoints.PrivateCourses.GetClasses, status_code=status.HTTP_200_OK, response_model=PaginatedList,
             summary="Get classes of the course")
 async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], page: int, db: Session = Depends(session)):
     # TODO - rewrite
@@ -51,7 +52,7 @@ async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], p
     return ResponseBuilder.success_response(content=response_model)
 
 
-@router.get(path="/{private_course_id}/classes/month/{month}/year/{year}/", status_code=status.HTTP_200_OK,
+@router.get(path=APIEndpoints.PrivateCourses.GetClassesByDate, status_code=status.HTTP_200_OK,
             response_model=list[ClassDto], summary="Get classes of the course for specific month")
 async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(session)):
     db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
@@ -64,7 +65,7 @@ async def get_classes_by_date(private_course_id: int, month: int, year: int, db:
     return ResponseBuilder.success_response(content=response_models)
 
 
-@router.get(path="/users/{user_id}/subjects/{subject_name}/", status_code=status.HTTP_200_OK,
+@router.get(path=APIEndpoints.PrivateCourses.Get, status_code=status.HTTP_200_OK,
             response_model=list[PrivateCourseInlineDto], summary="Get private courses for user by subject name")
 async def get_private_courses(user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student], db: Session = Depends(session)):
     db_private_courses = private_courses_crud.get_private_courses(db, user_id, subject_name, role)
@@ -77,7 +78,7 @@ async def get_private_courses(user_id: int, subject_name: str, role: Literal[Rol
     return ResponseBuilder.success_response(content=response_models)
 
 
-@router.post(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_201_CREATED,
+@router.post(path=APIEndpoints.PrivateCourses.Enroll, status_code=status.HTTP_201_CREATED,
              summary="Enroll student to course")
 async def enroll_in_course(user_id: int, private_course_id: int, db: Session = Depends(session)):
     # TODO: Rewrite
@@ -85,7 +86,7 @@ async def enroll_in_course(user_id: int, private_course_id: int, db: Session = D
     return ResponseBuilder.success_response(status.HTTP_201_CREATED)
 
 
-@router.post(path="/{private_course_id}/new-class/{role}/", status_code=status.HTTP_201_CREATED,
+@router.post(path=APIEndpoints.PrivateCourses.AddNewClass, status_code=status.HTTP_201_CREATED,
              summary="Add new class for private course")
 async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.Student],
                         new_class: NewClassDto, db: Session = Depends(session)):

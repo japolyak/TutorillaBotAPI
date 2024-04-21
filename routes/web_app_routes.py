@@ -7,12 +7,13 @@ from urllib.parse import parse_qs
 import json
 from routes.data_transfer_models import UserDto
 from builders.response_builder import ResponseBuilder
+from routes.api_enpoints import APIEndpoints
 
 
-router = APIRouter()
+router = APIRouter(prefix=APIEndpoints.WebApp.Prefix, tags=["web_app_authorization"])
 
 
-@router.get(path="/me/", status_code=status.HTTP_200_OK, response_model=UserDto,
+@router.get(path=APIEndpoints.WebApp.Me, status_code=status.HTTP_200_OK, response_model=UserDto,
             summary="Validates telegram user and returns user data")
 async def validate_telegram_user(request: Request, db: Session = Depends(session)):
     init_data: None or str = request.headers.get("Init-Data")

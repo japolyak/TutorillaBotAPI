@@ -7,12 +7,13 @@ from routes.sql_statement_repository import sql_statements
 from datetime import datetime
 from typing import Literal
 from builders.response_builder import ResponseBuilder
+from routes.api_enpoints import APIEndpoints
 
 
-router = APIRouter()
+router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
 
 
-@router.get(path="/{user_id}/", status_code=status.HTTP_200_OK, response_model=UserDto, summary="Gets user by id")
+@router.get(path=APIEndpoints.Users.GetUser, status_code=status.HTTP_200_OK, response_model=UserDto, summary="Gets user by id")
 async def get_user(user_id: int, db: Session = Depends(session)):
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
@@ -22,8 +23,8 @@ async def get_user(user_id: int, db: Session = Depends(session)):
     return ResponseBuilder.success_response(content=db_user)
 
 
-@router.post(path="/", status_code=status.HTTP_201_CREATED, summary="Adds a new user")
-async def add_user(user: UserBaseDto, db: Session = Depends(session)):
+@router.post(path=APIEndpoints.Users.Post, status_code=status.HTTP_201_CREATED, summary="Adds a new user")
+async def register_user(user: UserBaseDto, db: Session = Depends(session)):
     params = {
         'u_id': user.id,
         'u_first_name': user.first_name,
@@ -47,7 +48,7 @@ async def add_user(user: UserBaseDto, db: Session = Depends(session)):
         else ResponseBuilder.error_response(message='User addition was not successful')
 
 
-@router.post(path="/{user_id}/apply-role/{role}/", status_code=status.HTTP_201_CREATED)
+@router.post(path=APIEndpoints.Users.ApplyRole, status_code=status.HTTP_201_CREATED)
 async def apply_for_role(user_id: int, role: Literal[Role.Student, Role.Tutor], db: Session = Depends(session)):
     params = {
         'u_id': user_id,

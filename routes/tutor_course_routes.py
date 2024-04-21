@@ -4,11 +4,13 @@ from database.crud import tutor_course_crud
 from sqlalchemy.orm import Session
 from database.db_setup import session
 from builders.response_builder import ResponseBuilder
+from routes.api_enpoints import APIEndpoints
 
-router = APIRouter()
+
+router = APIRouter(prefix=APIEndpoints.TutorCourse.Prefix, tags=["tutor-courses"])
 
 
-@router.post(path="/users/{user_id}/", status_code=status.HTTP_201_CREATED,
+@router.post(path=APIEndpoints.TutorCourse.AddCourse, status_code=status.HTTP_201_CREATED,
              response_model=TutorCourseDto, description="Add course for tutor")
 async def add_course(new_tutor_course: NewTutorCourseDto, user_id: int, db: Session = Depends(session)):
     # TODO - rewrite
@@ -17,7 +19,7 @@ async def add_course(new_tutor_course: NewTutorCourseDto, user_id: int, db: Sess
     return ResponseBuilder.success_response(content=db_course)
 
 
-@router.get(path="/users/{user_id}/subject-name/{subject_name}/", status_code=status.HTTP_200_OK,
+@router.get(path=APIEndpoints.TutorCourse.AvailableCourses, status_code=status.HTTP_200_OK,
             response_model=list[TutorCourseInlineDto], description="Get available tutors")
 async def get_available_tutor_courses(user_id: int, subject_name: str, db: Session = Depends(session)):
     db_tutor_courses = tutor_course_crud.get_available_courses_by_subject(db=db, user_id=user_id, subject_name=subject_name)
