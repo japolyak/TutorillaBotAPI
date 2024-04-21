@@ -1,7 +1,9 @@
 from datetime import timezone, timedelta, datetime
+from typing import Literal
+from src.models import Role
 
 
-def transform_class_time(private_course, some_data: datetime, role: str) -> datetime:
+def transform_class_time(private_course, some_data: datetime, role: Literal[Role.Tutor, Role.Student]) -> datetime:
     # TODO - remake by abstracting from db_class
     match role:
         case "tutor":
