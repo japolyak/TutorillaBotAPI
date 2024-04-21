@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from . import config
-from .database import db_setup
-from .routers import admin, user, subject, private_course, tutor_course, web_app, test
+from src import config
+from src.database import db_setup
+from src.routers import admin, user, subject, private_course, tutor_course, web_app, test
 
 
 logging.basicConfig(encoding='utf-8', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')

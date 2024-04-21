@@ -20,9 +20,10 @@ def init_db():
         if not database_exists(database_url):
             create_database(database_url)
             db_initialized = True
-            logging.log(logging.INFO, "Database tables created")
+            logging.log(logging.INFO, "Database created")
 
         Base.metadata.create_all(bind=engine)
+        logging.log(logging.INFO, "Tables created")
 
         if db_initialized and is_development:
             insert_mock_data(engine)
