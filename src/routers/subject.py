@@ -1,5 +1,5 @@
 from fastapi import status, APIRouter, Depends
-from src.models import SubjectDto, Role
+from src.models import SubjectDto, Role, ItemsDto
 from sqlalchemy.orm import Session
 from src.database.db_setup import session
 from ..database.crud import subject_crud
@@ -12,7 +12,7 @@ router = APIRouter(prefix=APIEndpoints.Subjects.Prefix, tags=["subjects"])
 
 
 @router.get(path=APIEndpoints.Subjects.Get, status_code=status.HTTP_200_OK,
-            summary="Gets users subjects by user id", response_model=list[SubjectDto])
+            summary="Gets users subjects by user id", response_model=ItemsDto[SubjectDto])
 async def get_subjects(user_id: int, is_available: bool, role: Literal[Role.Student, Role.Tutor], db: Session = Depends(session)):
     role_to_function = {
         Role.Student: subject_crud.get_student_subjects,
@@ -21,9 +21,11 @@ async def get_subjects(user_id: int, is_available: bool, role: Literal[Role.Stud
 
     subjects_func = role_to_function.get(role)
 
-    response_models = subjects_func(db, user_id, is_available)
+    subjects = subjects_func(db, user_id, is_available)
 
-    if not response_models:
-        return ResponseBuilder.success_response(content=[])
+    if not subjects:
+        return ResponseBuilder.success_response(content=ItemsDto(items=[]))
 
-    return ResponseBuilder.success_response(content=response_models)
+    mapped_subjects = [SubjectDto(id=subject.id, name=subject.name) for subject in subjects]
+
+    return ResponseBuilder.success_response(content=ItemsDto(items=mapped_subjects))

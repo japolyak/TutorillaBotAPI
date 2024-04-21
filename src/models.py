@@ -22,6 +22,13 @@ class PaginatedList(BaseModel, Generic[T]):
         from_attributes = True
 
 
+class ItemsDto(BaseModel, Generic[T]):
+    items: List[T]
+
+    class Config:
+        from_attributes = True
+
+
 class UserBaseDto(BaseModel):
     id: int
     first_name: str
@@ -47,10 +54,11 @@ class UserDto(UserBaseDto):
 
 class UserRequestDto(BaseModel):
     id: int
-    request_datetime: datetime
-    user: UserDto
-    tutor_role: bool
-    student_role: bool
+    user_id: int
+    user_first_name: str
+    user_last_name: str
+    user_email: str
+    user_role: Role
 
     class Config:
         from_attributes = True

@@ -1,7 +1,7 @@
 from fastapi import status, Depends, APIRouter
 from src.bot_client.message_sender import send_decline_message
 from src.builders.response_builder import ResponseBuilder
-from src.models import UserDto, UserRequestDto, Role
+from src.models import UserDto, UserRequestDto, Role, ItemsDto
 from src.database.crud import admin_crud, user_crud
 from sqlalchemy.orm import Session
 from src.database.db_setup import session
@@ -12,28 +12,41 @@ from src.routers.api_enpoints import APIEndpoints
 router = APIRouter(prefix=APIEndpoints.Admin.Prefix, tags=["admin"])
 
 
-@router.get(path=APIEndpoints.Admin.GetRequests, status_code=status.HTTP_200_OK, response_model=list[UserRequestDto],
+@router.get(path=APIEndpoints.Admin.GetRequests, status_code=status.HTTP_200_OK, response_model=ItemsDto[UserRequestDto],
             summary="Get all requests by role")
-async def get_requests(role: Literal[Role.Student], db: Session = Depends(session)):
-    # TODO - rewrite
-    response_models = admin_crud.get_users_requests(db=db, role=role)
+async def get_requests(role: Literal[Role.Student, Role.Tutor], db: Session = Depends(session)):
+    requests = admin_crud.get_users_requests(db=db, role=role)
 
-    if response_models is None:
-        return ResponseBuilder.error_response(message=f'Requests for {role} were not found')
+    if not requests:
+        return ResponseBuilder.success_response(content=ItemsDto(items=[]))
 
-    return ResponseBuilder.success_response(content=response_models)
+    mapped_requests = [UserRequestDto(id=r[0],
+                                      user_id=r[1],
+                                      user_first_name=r[2],
+                                      user_last_name=r[3],
+                                      user_email=r[4],
+                                      user_role=r[5]
+                                      ) for r in requests]
+
+    return ResponseBuilder.success_response(content=ItemsDto[UserRequestDto](items=mapped_requests))
 
 
 @router.get(path=APIEndpoints.Admin.GetRequest, status_code=status.HTTP_200_OK, response_model=UserRequestDto,
             summary="Get request by request id")
 async def get_request(role_request_id: int, db: Session = Depends(session)):
-    # TODO - rewrite
-    db_request = admin_crud.get_user_request(db=db, role_request_id=role_request_id)
+    db_request = admin_crud.get_user_request(db, role_request_id)
 
     if db_request is None:
         return ResponseBuilder.error_response(message='User request was not found')
 
-    return ResponseBuilder.success_response(content=UserRequestDto.model_validate(db_request))
+    response_model = UserRequestDto(id=db_request[0],
+                                    user_id=db_request[1],
+                                    user_first_name=db_request[2],
+                                    user_last_name=db_request[3],
+                                    user_email=db_request[4],
+                                    user_role=db_request[5])
+
+    return ResponseBuilder.success_response(content=response_model)
 
 
 @router.put(path=APIEndpoints.Admin.AcceptRole, status_code=status.HTTP_200_OK, response_model=UserDto,

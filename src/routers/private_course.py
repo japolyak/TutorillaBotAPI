@@ -2,7 +2,7 @@ from fastapi import status, APIRouter, Depends
 import json
 from typing import Literal
 from src.bot_client.message_sender import send_notification_about_new_class
-from src.models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto
+from src.models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto, ItemsDto
 from sqlalchemy.orm import Session
 from src.database.db_setup import session
 from src.functions.time_transformator import transform_class_time
@@ -37,7 +37,6 @@ async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], p
 
         class_dto = PrivateClassBaseDto(
             id=db_class.id,
-            private_course=PrivateCourseDto.model_validate(db_class.private_course),
             schedule_datetime=new_time,
             assignment=sources,
             is_scheduled=db_class.is_scheduled,
@@ -55,6 +54,7 @@ async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], p
 @router.get(path=APIEndpoints.PrivateCourses.GetClassesByDate, status_code=status.HTTP_200_OK,
             response_model=list[ClassDto], summary="Get classes of the course for specific month")
 async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(session)):
+    # TODO - implement ItemsDto - web-app
     db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
 
     if not db_classes:
@@ -66,16 +66,16 @@ async def get_classes_by_date(private_course_id: int, month: int, year: int, db:
 
 
 @router.get(path=APIEndpoints.PrivateCourses.Get, status_code=status.HTTP_200_OK,
-            response_model=list[PrivateCourseInlineDto], summary="Get private courses for user by subject name")
+            response_model=ItemsDto[PrivateCourseInlineDto], summary="Get private courses for user by subject name")
 async def get_private_courses(user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student], db: Session = Depends(session)):
     db_private_courses = private_courses_crud.get_private_courses(db, user_id, subject_name, role)
 
     if not db_private_courses:
-        return ResponseBuilder.success_response(content=[])
+        return ResponseBuilder.success_response(content=ItemsDto(items=[]))
 
-    response_models = [PrivateCourseInlineDto(id=pc[0], person_name=pc[1], subject_name=pc[2]) for pc in db_private_courses]
+    private_courses = [PrivateCourseInlineDto(id=pc[0], person_name=pc[1], subject_name=pc[2]) for pc in db_private_courses]
 
-    return ResponseBuilder.success_response(content=response_models)
+    return ResponseBuilder.success_response(content=ItemsDto[PrivateCourseInlineDto](items=private_courses))
 
 
 @router.post(path=APIEndpoints.PrivateCourses.Enroll, status_code=status.HTTP_201_CREATED,
