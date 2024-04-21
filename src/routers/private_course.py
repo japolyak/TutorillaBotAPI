@@ -2,7 +2,8 @@ from fastapi import status, APIRouter, Depends
 import json
 from typing import Literal
 from src.bot_client.message_sender import send_notification_about_new_class
-from src.models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto, ItemsDto
+from src.models import (PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role,
+                        PrivateCourseInlineDto, ItemsDto)
 from sqlalchemy.orm import Session
 from src.database.db_setup import session
 from src.functions.time_transformator import transform_class_time
@@ -45,24 +46,25 @@ async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], p
         )
         classes.append(class_dto)
 
-    response_model: PaginatedList[PrivateClassBaseDto] = PaginatedList[PrivateClassBaseDto](items=classes, total=count,
-                                                                                    current_page=page, pages=pages)
+    response_model: PaginatedList[PrivateClassBaseDto] = PaginatedList[PrivateClassBaseDto](items=classes,
+                                                                                            total=count,
+                                                                                            current_page=page,
+                                                                                            pages=pages)
 
     return ResponseBuilder.success_response(content=response_model)
 
 
 @router.get(path=APIEndpoints.PrivateCourses.GetClassesByDate, status_code=status.HTTP_200_OK,
-            response_model=list[ClassDto], summary="Get classes of the course for specific month")
+            response_model=ItemsDto[ClassDto], summary="Get classes of the course for specific month")
 async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(session)):
-    # TODO - implement ItemsDto - web-app
     db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
 
     if not db_classes:
-        return ResponseBuilder.success_response(content=[])
+        return ResponseBuilder.success_response(content=ItemsDto(items=[]))
 
-    response_models = [ClassDto(date=db_class[0], status=db_class[1]) for db_class in db_classes]
+    classes = [ClassDto(date=db_class[0], status=db_class[1]) for db_class in db_classes]
 
-    return ResponseBuilder.success_response(content=response_models)
+    return ResponseBuilder.success_response(content=ItemsDto[ClassDto](items=classes))
 
 
 @router.get(path=APIEndpoints.PrivateCourses.Get, status_code=status.HTTP_200_OK,
