@@ -85,6 +85,15 @@ class PrivateCourseDto(BaseModel):
         from_attributes = True
 
 
+class PrivateCourseInlineDto(BaseModel):
+    id: int
+    person_name: str
+    subject_name: str
+
+    class Config:
+        from_attributes = True
+
+
 class SourceDto(BaseModel):
     title: str
     assignment: str

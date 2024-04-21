@@ -2,7 +2,7 @@ from fastapi import status, APIRouter, Depends, Response
 import json
 from typing import Literal
 from bot_client.message_sender import send_notification_about_new_class
-from routes.data_transfer_models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, ClassStatus, Role
+from routes.data_transfer_models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto
 from sqlalchemy.orm import Session
 from database.db_setup import session
 from functions.time_transformator import transform_class_time
@@ -55,55 +55,28 @@ async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], p
 @router.get(path="/{private_course_id}/classes/month/{month}/year/{year}/", status_code=status.HTTP_200_OK,
             response_model=list[ClassDto], summary="Get classes of the course for specific month")
 async def get_classes_by_date(private_course_id: int, month: int, year: int, db: Session = Depends(session)):
-    # TODO - rewrite
-    db_private_course = private_courses_crud.get_private_course_by_course_id(db=db, private_course_id=private_course_id)
-
-    if not db_private_course:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'message': 'Private course was not found'})
-
     db_classes = private_courses_crud.get_private_course_classes_for_month(db, private_course_id, month, year)
 
     if not db_classes:
         return JSONResponse(status_code=status.HTTP_200_OK, content=jsonable_encoder([]))
 
-    response_model: list[ClassDto] = []
+    response_models = [ClassDto(date=db_class[0], status=db_class[1]) for db_class in db_classes]
 
-    for db_class in db_classes:
-        if db_class.is_paid:
-            class_dto = ClassDto(date=db_class.schedule_datetime, status=ClassStatus.Paid)
-        elif db_class.has_occurred:
-            class_dto = ClassDto(date=db_class.schedule_datetime, status=ClassStatus.Occurred)
-        else:
-            class_dto = ClassDto(date=db_class.schedule_datetime, status=ClassStatus.Scheduled)
-
-        response_model.append(class_dto)
-
-    classes = jsonable_encoder(response_model)
+    classes = jsonable_encoder(response_models)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=classes)
 
 
 @router.get(path="/users/{user_id}/subjects/{subject_name}/", status_code=status.HTTP_200_OK,
-            response_model=list[PrivateCourseDto], summary="Get private courses for user by subject name")
+            response_model=list[PrivateCourseInlineDto], summary="Get private courses for user by subject name")
 async def get_private_courses(user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student], db: Session = Depends(session)):
-    # TODO - rewrite
-    db_private_courses = private_courses_crud.get_private_courses(db=db, user_id=user_id, subject_name=subject_name, role=role)
-    private_courses = jsonable_encoder(db_private_courses)
+    db_private_courses = private_courses_crud.get_private_courses(db, user_id, subject_name, role)
+
+    response_models = [PrivateCourseInlineDto(id=pc[0], person_name=pc[1], subject_name=pc[2]) for pc in db_private_courses]
+
+    private_courses = jsonable_encoder(response_models)
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=private_courses)
-
-
-# TODO - rewrite route - maybe useless endpoint
-@router.get(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_200_OK,
-            description="Get private courses")
-async def get_private_courses(user_id: int, private_course_id: int, db: Session = Depends(session)):
-    # TODO - rewrite
-    db_private_course = private_courses_crud.get_private_course_by_course_id(db=db, private_course_id=private_course_id)
-
-    if not db_private_course:
-        return Response(status_code=status.HTTP_400_BAD_REQUEST)
-
-    return status.HTTP_200_OK
 
 
 @router.post(path="/{private_course_id}/users/{user_id}/", status_code=status.HTTP_201_CREATED,
@@ -116,7 +89,8 @@ async def enroll_in_course(user_id: int, private_course_id: int, db: Session = D
 
 @router.post(path="/{private_course_id}/new-class/{role}/", status_code=status.HTTP_201_CREATED,
              summary="Add new class for private course")
-async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.Student], new_class: NewClassDto, db: Session = Depends(session)):
+async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.Student],
+                        new_class: NewClassDto, db: Session = Depends(session)):
     schedule = new_class.date
     assignment = {
         "sources": [source.model_dump_json() for source in new_class.sources]
@@ -143,7 +117,8 @@ async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.S
     recipient_id, recipient_timezone, sender_name, subject_name, error_msg = result_row
 
     if error_msg:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={'message': 'Class addition was not successful'})
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                            content={'message': 'Class addition was not successful'})
 
     new_timezone = timezone(timedelta(hours=recipient_timezone))
 

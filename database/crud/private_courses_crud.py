@@ -1,10 +1,9 @@
-from database.models import TutorCourse, Subject, PrivateCourse
-from sqlalchemy import asc, func
+from database.models import TutorCourse, Subject, PrivateCourse, User, PrivateClass
+from routes.data_transfer_models import Role, ClassStatus
+from sqlalchemy import asc, func, case, literal_column
 from sqlalchemy.orm import Session, joinedload
-from database.models import PrivateClass
 from datetime import datetime
 from typing import Literal
-from routes.data_transfer_models import Role
 
 
 def get_private_course_classes(db: Session, items_per_page: int, course_id: int, page: int = 1):
@@ -25,39 +24,34 @@ def get_private_course_classes(db: Session, items_per_page: int, course_id: int,
 
 
 def get_private_course_classes_for_month(db: Session, course_id: int, month: int, year: int):
-    start_date = datetime(year, month - 1, 25)
-    finish_date = datetime(year, month + 1, 5)
+    start_date = datetime(year, month - 1, 24)
+    finish_date = datetime(year, month + 1, 6)
 
-    query = (
-        db.query(PrivateClass)
-        .filter(
-            PrivateClass.private_course_id == course_id,
-            PrivateClass.schedule_datetime >= start_date,
-            PrivateClass.schedule_datetime <= finish_date
-        ))
+    status = (case((PrivateClass.is_paid, literal_column(f"'{ClassStatus.Paid}'")),
+                   (PrivateClass.has_occurred, literal_column(f"'{ClassStatus.Occurred}'")),
+                   else_=literal_column(f"'{ClassStatus.Scheduled}'")))
+
+    query = (db.query(PrivateClass.schedule_datetime, status)
+             .filter(
+        PrivateClass.private_course_id == course_id,
+        PrivateClass.schedule_datetime >= start_date,
+        PrivateClass.schedule_datetime <= finish_date))
 
     return query.all()
 
 
 def get_private_courses(db: Session, user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student]):
-    if role == Role.Tutor:
-        db_courses = (
-            db.query(PrivateCourse)
-            .join(PrivateCourse.course)
-            .join(TutorCourse.subject)
-            .filter(TutorCourse.tutor_id == user_id, Subject.name == subject_name)
-            .all()
-        )
-    else: # role == Role.Student
-        db_courses = (
-            db.query(PrivateCourse)
-            .join(PrivateCourse.course)
-            .join(TutorCourse.subject)
-            .filter(PrivateCourse.student_id == user_id, Subject.name == subject_name)
-            .all()
-        )
+    query = (db.query(PrivateCourse.id, Subject.name, User.first_name)
+             .join(PrivateCourse.course)
+             .join(TutorCourse.subject)
+             .filter(Subject.name == subject_name))
 
-    return db_courses
+    if role == Role.Student:
+        query = query.join(TutorCourse.tutor).filter(PrivateCourse.student_id == user_id)
+    else:
+        query = query.join(PrivateCourse.student).filter(TutorCourse.tutor_id == user_id)
+
+    return query.all()
 
 
 def get_private_course_by_course_id(db: Session, private_course_id: int):
