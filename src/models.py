@@ -1,8 +1,15 @@
 from pydantic import BaseModel
 from typing import List, Generic, TypeVar
 from datetime import datetime
+from enum import StrEnum
 
 T = TypeVar('T')
+
+
+class Role(StrEnum):
+    Admin = 'admin'
+    Tutor = 'tutor'
+    Student = 'student'
 
 
 class PaginatedList(BaseModel, Generic[T]):
@@ -10,6 +17,13 @@ class PaginatedList(BaseModel, Generic[T]):
     total: int
     current_page: int
     pages: int
+
+    class Config:
+        from_attributes = True
+
+
+class ItemsDto(BaseModel, Generic[T]):
+    items: List[T]
 
     class Config:
         from_attributes = True
@@ -40,10 +54,11 @@ class UserDto(UserBaseDto):
 
 class UserRequestDto(BaseModel):
     id: int
-    request_datetime: datetime
-    user: UserDto
-    tutor_role: bool
-    student_role: bool
+    user_id: int
+    user_first_name: str
+    user_last_name: str
+    user_email: str
+    user_role: Role
 
     class Config:
         from_attributes = True
@@ -68,11 +83,30 @@ class TutorCourseDto(BaseModel):
         from_attributes = True
 
 
+class TutorCourseInlineDto(BaseModel):
+    id: int
+    tutor_name: str
+    subject_name: str
+    price: int
+
+    class Config:
+        from_attributes = True
+
+
 class PrivateCourseDto(BaseModel):
     id: int
     student: UserDto
     course: TutorCourseDto
     price: int
+
+    class Config:
+        from_attributes = True
+
+
+class PrivateCourseInlineDto(BaseModel):
+    id: int
+    person_name: str
+    subject_name: str
 
     class Config:
         from_attributes = True
@@ -118,6 +152,20 @@ class PrivateClassDto(BaseModel):
 class NewTutorCourseDto(BaseModel):
     subject_id: int
     price: int
+
+    class Config:
+        from_attributes = True
+
+
+class ClassStatus(StrEnum):
+    Scheduled = 'scheduled'
+    Occurred = 'occurred'
+    Paid = 'paid'
+
+
+class ClassDto(BaseModel):
+    date: datetime
+    status: ClassStatus
 
     class Config:
         from_attributes = True

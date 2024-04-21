@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import Engine
-from .models import User, Subject, TutorCourse, PrivateCourse, PrivateClass
-from routes.schemas import SourceDto
-from config import my_tg_id, admin_tg_id
+from src.database.models import User, Subject, TutorCourse, PrivateCourse, PrivateClass
+from src.models import SourceDto
+from src.config import my_tg_id, admin_tg_id
 
 
 def insert_mock_data(engine: Engine):
