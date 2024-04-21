@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from database.models import TutorCourse, Subject, User
-from routes.data_transfer_models import NewTutorCourseDto
+from routers.data_transfer_models import NewTutorCourseDto
 
 
 def add_course(db: Session, user_id: int, course: NewTutorCourseDto):

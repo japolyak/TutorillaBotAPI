@@ -1,13 +1,13 @@
 from fastapi import status, Depends, APIRouter
-from routes.data_transfer_models import UserDto, UserBaseDto, Role
+from routers.data_transfer_models import UserDto, UserBaseDto, Role
 from database.crud import user_crud
 from sqlalchemy.orm import Session
 from database.db_setup import session
-from routes.sql_statement_repository import sql_statements
+from routers.sql_statement_repository import sql_statements
 from datetime import datetime
 from typing import Literal
 from builders.response_builder import ResponseBuilder
-from routes.api_enpoints import APIEndpoints
+from routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])

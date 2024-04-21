@@ -2,15 +2,15 @@ from fastapi import status, APIRouter, Depends
 import json
 from typing import Literal
 from bot_client.message_sender import send_notification_about_new_class
-from routes.data_transfer_models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto
+from routers.data_transfer_models import PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto
 from sqlalchemy.orm import Session
 from database.db_setup import session
 from functions.time_transformator import transform_class_time
 from database.crud import private_courses_crud
-from routes.sql_statement_repository import sql_statements
+from routers.sql_statement_repository import sql_statements
 from datetime import timezone, timedelta
 from builders.response_builder import ResponseBuilder
-from routes.api_enpoints import APIEndpoints
+from routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.PrivateCourses.Prefix, tags=["private-courses"])

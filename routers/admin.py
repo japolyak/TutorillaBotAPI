@@ -1,12 +1,12 @@
 from fastapi import status, Depends, APIRouter
 from bot_client.message_sender import send_decline_message
-from routes.data_transfer_models import UserDto, UserRequestDto, Role
+from routers.data_transfer_models import UserDto, UserRequestDto, Role
 from database.crud import user_crud, admin_crud
 from sqlalchemy.orm import Session
 from database.db_setup import session
 from typing import Literal
 from builders.response_builder import ResponseBuilder
-from routes.api_enpoints import APIEndpoints
+from routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.Admin.Prefix, tags=["admin"])

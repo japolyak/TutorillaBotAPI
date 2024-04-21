@@ -5,7 +5,7 @@ from database.db_setup import session
 from database.crud import subject_crud
 from typing import Literal
 from builders.response_builder import ResponseBuilder
-from routes.api_enpoints import APIEndpoints
+from routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.Subjects.Prefix, tags=["subjects"])

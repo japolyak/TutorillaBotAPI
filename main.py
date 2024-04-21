@@ -2,13 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config import allowed_origins
 from database.db_setup import init_db
-from routes.admin_routes import router as admin_router
-from routes.private_course_routes import router as private_course_router
-from routes.subject_routes import router as subject_router
-from routes.tutor_course_routes import router as tutor_course_router
-from routes.user_routes import router as user_router
-from routes.web_app_routes import router as web_app_router
-from routes.test_routes import router as test_router
+from routers.admin import router as admin_router
+from routers.private_course import router as private_course_router
+from routers.subject import router as subject_router
+from routers.tutor_course import router as tutor_course_router
+from routers.user import router as user_router
+from routers.web_app import router as web_app_router
+from routers.test import router as test_router
 import logging
 
 

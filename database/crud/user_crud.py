@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from database.models import User, UserRequest
 from typing import Literal
-from routes.data_transfer_models import Role
+from routers.data_transfer_models import Role
 
 
 def get_user(db: Session, user_id: int):
