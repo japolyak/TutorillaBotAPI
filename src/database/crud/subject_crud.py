@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from database.models import TutorCourse, Subject, PrivateCourse
+from src.database.models import TutorCourse, Subject, PrivateCourse
 
 
 def get_student_subjects(db: Session, user_id: int, available: bool):

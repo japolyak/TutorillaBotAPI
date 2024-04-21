@@ -1,11 +1,11 @@
 from fastapi import status, APIRouter, Depends
-from .data_transfer_models import SubjectDto, Role
+from src.models import SubjectDto, Role
 from sqlalchemy.orm import Session
-from database.db_setup import session
-from database.crud import subject_crud
+from src.database.db_setup import session
+from ..database.crud import subject_crud
 from typing import Literal
-from builders.response_builder import ResponseBuilder
-from routers.api_enpoints import APIEndpoints
+from src.builders.response_builder import ResponseBuilder
+from src.routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.Subjects.Prefix, tags=["subjects"])

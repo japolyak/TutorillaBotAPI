@@ -1,4 +1,4 @@
-from bot_client.bot_token import bot
+from src.bot_client.bot_token import bot
 
 
 def send_decline_message(tg_user_id):

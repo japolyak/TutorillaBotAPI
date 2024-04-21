@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from database.models import UserRequest
+from src.database.models import UserRequest
 from typing import Literal
-from routers.data_transfer_models import Role
+from src.models import Role
 
 
 def get_users_requests(db: Session, role: Literal[Role.Tutor, Role.Student]):

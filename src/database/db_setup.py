@@ -1,9 +1,9 @@
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine
 from sqlalchemy_utils import database_exists, create_database
-from database.models import Base
+from src.database.models import Base
 from sqlalchemy.orm import sessionmaker
-from .mockdata import insert_mock_data
-from config import db_username as username, db_password, db_host, db_port, db_name, db_initialized, is_development
+from src.database.mockdata import insert_mock_data
+from src.config import db_username as username, db_password, db_host, db_port, db_name, is_development
 import logging
 
 
@@ -38,7 +38,3 @@ def session():
         yield db
     finally:
         db.close()
-
-
-def cursor():
-    return engine.raw_connection().cursor()

@@ -1,10 +1,10 @@
 from fastapi import status, APIRouter, Depends
-from routers.data_transfer_models import TutorCourseDto, NewTutorCourseDto, TutorCourseInlineDto
-from database.crud import tutor_course_crud
+from src.models import TutorCourseDto, NewTutorCourseDto, TutorCourseInlineDto
+from src.database.crud import tutor_course_crud
 from sqlalchemy.orm import Session
-from database.db_setup import session
-from builders.response_builder import ResponseBuilder
-from routers.api_enpoints import APIEndpoints
+from src.database.db_setup import session
+from src.builders.response_builder import ResponseBuilder
+from src.routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.TutorCourse.Prefix, tags=["tutor-courses"])

@@ -1,5 +1,5 @@
-from database.models import TutorCourse, Subject, PrivateCourse, User, PrivateClass
-from routers.data_transfer_models import Role, ClassStatus
+from src.database.models import TutorCourse, Subject, PrivateCourse, User, PrivateClass
+from src.models import Role, ClassStatus
 from sqlalchemy import asc, func, case, literal_column
 from sqlalchemy.orm import Session, joinedload
 from datetime import datetime

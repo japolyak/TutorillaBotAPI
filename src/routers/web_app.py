@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Request, status, Depends
 from sqlalchemy.orm import Session
-from functions.telegram_valdiator import init_data_is_valid
-from database.crud import user_crud
-from database.db_setup import session
+from src.functions.telegram_valdiator import init_data_is_valid
+from src.database.crud import user_crud
+from src.database.db_setup import session
 from urllib.parse import parse_qs
 import json
-from routers.data_transfer_models import UserDto
-from builders.response_builder import ResponseBuilder
-from routers.api_enpoints import APIEndpoints
+from src.models import UserDto
+from src.builders.response_builder import ResponseBuilder
+from src.routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.WebApp.Prefix, tags=["web_app_authorization"])

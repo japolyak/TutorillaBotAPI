@@ -1,6 +1,6 @@
 from datetime import timezone, timedelta, datetime
 from typing import Literal
-from routers.data_transfer_models import Role
+from src.models import Role
 
 
 def transform_class_time(private_course, some_data: datetime, role: Literal[Role.Tutor, Role.Student]) -> datetime:

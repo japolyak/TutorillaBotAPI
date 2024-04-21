@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from routers.api_enpoints import APIEndpoints
+from src.routers.api_enpoints import APIEndpoints
 
 
 router = APIRouter(prefix=APIEndpoints.Test.Prefix, tags=["test"])
