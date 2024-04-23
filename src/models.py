@@ -6,6 +6,12 @@ from enum import StrEnum
 T = TypeVar('T')
 
 
+class ClassStatus(StrEnum):
+    Scheduled = 'scheduled'
+    Occurred = 'occurred'
+    Paid = 'paid'
+
+
 class Role(StrEnum):
     Admin = 'admin'
     Tutor = 'tutor'
@@ -128,6 +134,13 @@ class NewClassDto(BaseModel):
         from_attributes = True
 
 
+# TODO
+class PrivateClassForPaginationDto(BaseModel):
+    id: int
+    schedule_datetime: datetime
+    status: ClassStatus
+
+
 class PrivateClassBaseDto(BaseModel):
     id: int
     schedule_datetime: datetime
@@ -155,12 +168,6 @@ class NewTutorCourseDto(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class ClassStatus(StrEnum):
-    Scheduled = 'scheduled'
-    Occurred = 'occurred'
-    Paid = 'paid'
 
 
 class ClassDto(BaseModel):
