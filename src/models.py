@@ -134,8 +134,7 @@ class NewClassDto(BaseModel):
         from_attributes = True
 
 
-# TODO
-class PrivateClassForPaginationDto(BaseModel):
+class PrivateClassDto(BaseModel):
     id: int
     schedule_datetime: datetime
     status: ClassStatus
@@ -148,15 +147,6 @@ class PrivateClassBaseDto(BaseModel):
     is_scheduled: bool
     has_occurred: bool
     is_paid: bool
-
-    class Config:
-        from_attributes = True
-
-
-# TODO - rename model
-class PrivateClassDto(BaseModel):
-    private_course: PrivateCourseDto
-    classes: List[PrivateClassBaseDto]
 
     class Config:
         from_attributes = True

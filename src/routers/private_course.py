@@ -3,7 +3,7 @@ import json
 from typing import Literal
 from src.bot_client.message_sender import send_notification_about_new_class
 from src.models import (PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto, ItemsDto,
-                        PrivateClassForPaginationDto)
+                        PrivateClassDto)
 from sqlalchemy.orm import Session
 from src.database.db_setup import session
 from src.functions.time_transformator import transform_class_time
@@ -17,13 +17,13 @@ router = APIRouter(prefix=APIEndpoints.PrivateCourses.Prefix, tags=["private-cou
 
 
 @router.get(path=APIEndpoints.PrivateCourses.GetClasses, status_code=status.HTTP_200_OK,
-            response_model=PaginatedList[PrivateClassForPaginationDto], summary="Get classes of the course")
-async def get_classes(course_id: int, user_id: int, role: Literal[Role.Tutor, Role.Student], page: int, db: Session = Depends(session)):
+            response_model=PaginatedList[PrivateClassDto], summary="Get classes of the course")
+async def get_classes_for_bot(course_id: int, user_id: int, role: Literal[Role.Tutor, Role.Student], page: int, db: Session = Depends(session)):
     result = db.execute(sql_statements.get_classes, {"p1": user_id, "p2": course_id, "p3": page, "p4": role})
 
     total_count = None
     user_timezone = None
-    classes: list[PrivateClassForPaginationDto] = []
+    classes: list[PrivateClassDto] = []
 
     for row in result.fetchall():
         if row[0] is None:
@@ -35,10 +35,10 @@ async def get_classes(course_id: int, user_id: int, role: Literal[Role.Tutor, Ro
 
         new_time = transform_class_time(row[2], row[3])
 
-        private_class = PrivateClassForPaginationDto(id=row[0], schedule_datetime=new_time, status=row[4])
+        private_class = PrivateClassDto(id=row[0], schedule_datetime=new_time, status=row[4])
         classes.append(private_class)
 
-    response_model = PaginatedList[PrivateClassForPaginationDto](
+    response_model = PaginatedList[PrivateClassDto](
         items=classes,
         total=total_count,
         current_page=page,
