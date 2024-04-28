@@ -1,55 +1,48 @@
-from fastapi import status, APIRouter, Depends
 import json
 from typing import Literal
-from src.bot_client.message_sender import send_notification_about_new_class
-from src.models import (PrivateCourseDto, SourceDto, PrivateClassBaseDto, PaginatedList, NewClassDto, ClassDto, Role,
-                        PrivateCourseInlineDto, ItemsDto)
 from sqlalchemy.orm import Session
 from src.database.db_setup import session
-from src.functions.time_transformator import transform_class_time
-from src.database.crud import private_courses_crud
-from src.routers.sql_statement_repository import sql_statements
-from datetime import timezone, timedelta
-from src.builders.response_builder import ResponseBuilder
+from fastapi import status, APIRouter, Depends
 from src.routers.api_enpoints import APIEndpoints
+from src.database.crud import private_courses_crud
+from src.builders.response_builder import ResponseBuilder
+from src.routers.sql_statement_repository import sql_statements
+from src.functions.time_transformator import transform_class_time
+from src.bot_client.message_sender import send_notification_about_new_class
+from src.models import (PaginatedList, NewClassDto, ClassDto, Role, PrivateCourseInlineDto, ItemsDto,
+                        PrivateClassDto)
 
 
 router = APIRouter(prefix=APIEndpoints.PrivateCourses.Prefix, tags=["private-courses"])
 
 
-@router.get(path=APIEndpoints.PrivateCourses.GetClasses, status_code=status.HTTP_200_OK, response_model=PaginatedList,
-            summary="Get classes of the course")
-async def get_classes(course_id: int, role: Literal[Role.Tutor, Role.Student], page: int, db: Session = Depends(session)):
-    # TODO - rewrite
-    items_per_page = 3
-    db_classes, count = private_courses_crud.get_private_course_classes(db, items_per_page, course_id, page)
-    pages = 1 + count // items_per_page
+@router.get(path=APIEndpoints.PrivateCourses.GetClasses, status_code=status.HTTP_200_OK,
+            response_model=PaginatedList[PrivateClassDto], summary="Get classes of the course")
+async def get_classes_for_bot(course_id: int, user_id: int, role: Literal[Role.Tutor, Role.Student], page: int, db: Session = Depends(session)):
+    result = db.execute(sql_statements.get_classes, {"p1": user_id, "p2": course_id, "p3": page, "p4": role})
 
-    private_course_dto = None
-    classes: list[PrivateClassBaseDto] = []
+    total_count = None
+    user_timezone = None
+    classes: list[PrivateClassDto] = []
 
-    for db_class in db_classes:
-        if not private_course_dto:
-            private_course_dto = PrivateCourseDto.model_validate(db_class.private_course)
+    for row in result.fetchall():
+        if row[0] is None:
+            return ResponseBuilder.error_response(message=row[4])
 
-        sources = [SourceDto(**json.loads(item)) for item in db_class.assignment.get('sources', [])]
+        if total_count is None or user_timezone is None:
+            total_count = row[1]
+            user_timezone = row[3]
 
-        new_time = transform_class_time(db_class.private_course, db_class.schedule_datetime, role)
+        new_time = transform_class_time(row[2], row[3])
 
-        class_dto = PrivateClassBaseDto(
-            id=db_class.id,
-            schedule_datetime=new_time,
-            assignment=sources,
-            is_scheduled=db_class.is_scheduled,
-            has_occurred=db_class.has_occurred,
-            is_paid=db_class.is_paid
-        )
-        classes.append(class_dto)
+        private_class = PrivateClassDto(id=row[0], schedule_datetime=new_time, status=row[4])
+        classes.append(private_class)
 
-    response_model: PaginatedList[PrivateClassBaseDto] = PaginatedList[PrivateClassBaseDto](items=classes,
-                                                                                            total=count,
-                                                                                            current_page=page,
-                                                                                            pages=pages)
+    response_model = PaginatedList[PrivateClassDto](
+        items=classes,
+        total=total_count,
+        current_page=page,
+        pages=1 + total_count // 3)
 
     return ResponseBuilder.success_response(content=response_model)
 
@@ -120,9 +113,7 @@ async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.S
     if error_msg:
         return ResponseBuilder.error_response(message='Class addition was not successful')
 
-    new_timezone = timezone(timedelta(hours=recipient_timezone))
-
-    class_date = schedule.astimezone(new_timezone).strftime('%H:%M %d-%m-%Y')
+    class_date = transform_class_time(schedule, recipient_timezone).strftime('%H:%M %d-%m-%Y')
 
     send_notification_about_new_class(recipient_id, sender_name, subject_name, class_date)
 

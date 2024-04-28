@@ -6,23 +6,6 @@ from datetime import datetime
 from typing import Literal
 
 
-def get_private_course_classes(db: Session, items_per_page: int, course_id: int, page: int = 1):
-    offset = (page - 1) * items_per_page
-
-    query_one = (
-        db.query(PrivateClass)
-        .order_by(asc(PrivateClass.schedule_datetime))
-        .filter(PrivateClass.private_course_id == course_id)
-        .offset(offset)
-        .limit(items_per_page))
-
-    query_two = (
-        db.query(func.count(PrivateClass.id))
-        .filter(PrivateClass.private_course_id == course_id))
-
-    return query_one.all(), query_two.scalar()
-
-
 def get_private_course_classes_for_month(db: Session, course_id: int, month: int, year: int):
     start_date = datetime(year, month - 1, 24)
     finish_date = datetime(year, month + 1, 6)

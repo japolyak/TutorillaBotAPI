@@ -4,7 +4,10 @@ from src.database.models import TutorCourse, Subject, PrivateCourse
 
 
 def get_student_subjects(db: Session, user_id: int, available: bool):
-    sub_query = select(1).select_from(PrivateCourse).where(PrivateCourse.course_id == TutorCourse.id).exists()
+    sub_query = (select(1)
+                 .select_from(PrivateCourse)
+                 .filter(PrivateCourse.course_id == TutorCourse.id, PrivateCourse.student_id == user_id)
+                 .exists())
 
     query = (db.query(Subject)
              .join(Subject.tutor_courses)
