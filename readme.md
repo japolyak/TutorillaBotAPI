@@ -1,15 +1,15 @@
 # TutorillaBotAPI
 
 This application is part of the [TutotillaBot](https://github.com/users/japolyak/projects/2/views/4) project.
-It connects [TutotillaBot](https://github.com/japolyak/TutorillaBot) and [TutorillaBotWebApp](https://github.com/japolyak/TutorillaBotWebApp) with `PostgreSQL` database.
+It connects [TutotillaBot](https://github.com/japolyak/TutorillaBot) and [TutorillaBotWebApp](https://github.com/japolyak/TutorillaBotWebApp) with database.
 
 ## API
 
-The API is built using FastAPI for creating endpoints, Pydantic for data validation and settings management, and SQLAlchemy for ORM  and database operations.
+The API is built using `FastAPI` for creating endpoints, `Pydantic` for data validation and settings management, and `SQLAlchemy` for ORM  and database operations.
 
 ## Database
 
-The application uses a PostgreSQL database hosted on a Google Cloud virtual machine located in the North America region.
+The application uses a `PostgreSQL` database hosted on a `Google Cloud` virtual machine located in the North America region.
 This choice was based on financial considerations. Due to the database's location, requests to the database may take slightly longer than usual.
 To mitigate this, some requests are made (and others will be rewritten) as transactions or functions to reduce the number of database requests.
 
