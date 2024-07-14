@@ -21,7 +21,7 @@ router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
     summary="Gets user by id"
 )
 async def get_user(user_id: int, db: Session = Depends(session)):
-    logging.log(logging.INFO, f"Getting user with id: {user_id}")
+    logging.info(f"Getting user with id: {user_id}")
 
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
