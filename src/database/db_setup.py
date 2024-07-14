@@ -11,6 +11,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
+    print(connection_string)
     try:
         db_initialized = False
 
