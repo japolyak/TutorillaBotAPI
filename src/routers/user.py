@@ -1,4 +1,8 @@
+import logging
+
 from fastapi import status, Depends, APIRouter
+
+from src.config import connection_string
 from src.models import UserDto, UserBaseDto, Role
 from src.database.crud import user_crud
 from sqlalchemy.orm import Session
@@ -20,6 +24,8 @@ router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
     summary="Gets user by id"
 )
 async def get_user(user_id: int, db: Session = Depends(session)):
+    logging.log(logging.INFO, f"Connection string test: {connection_string}")
+
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
     if db_user is None:
