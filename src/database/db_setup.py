@@ -3,7 +3,7 @@ from sqlalchemy_utils import database_exists, create_database
 from src.database.models import Base
 from sqlalchemy.orm import sessionmaker
 from src.database.mockdata import insert_mock_data
-from src.config import db_username as username, db_password, db_host, db_port, db_name, is_development
+from src.config import db_username as username, db_password, db_host, db_port, db_name, is_development, connection_string as cns
 import logging
 
 
@@ -24,6 +24,7 @@ def init_db():
             logging.log(logging.INFO, "Database created")
 
         Base.metadata.create_all(bind=engine)
+        logging.log(logging.INFO, cns)
         logging.log(logging.INFO, "Tables created")
 
         if db_initialized and is_development:
