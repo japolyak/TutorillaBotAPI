@@ -11,6 +11,8 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
+    logging.error(f"Connection string test: {connection_string}")
+
     try:
         db_initialized = False
 
@@ -32,6 +34,8 @@ def init_db():
 
 
 def session():
+    logging.error(f"Connection string test: {connection_string}")
+
     db = SessionLocal()
     try:
         yield db
