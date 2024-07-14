@@ -24,7 +24,7 @@ def init_db():
             logging.log(logging.INFO, "Database created")
 
         Base.metadata.create_all(bind=engine)
-        logging.log(logging.INFO, cns)
+        logging.info(cns)
         logging.log(logging.INFO, "Tables created")
 
         if db_initialized and is_development:
