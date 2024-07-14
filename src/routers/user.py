@@ -1,4 +1,5 @@
 from fastapi import status, Depends, APIRouter
+import logging
 
 from src.config import connection_string
 from src.models import UserDto, UserBaseDto, Role
@@ -22,7 +23,7 @@ router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
     summary="Gets user by id"
 )
 async def get_user(user_id: int, db: Session = Depends(session)):
-    print(connection_string)
+    logging.error(f"Connection string: {connection_string}")
 
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
