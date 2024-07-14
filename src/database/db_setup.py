@@ -3,13 +3,10 @@ from sqlalchemy_utils import database_exists, create_database
 from src.database.models import Base
 from sqlalchemy.orm import sessionmaker
 from src.database.mockdata import insert_mock_data
-from src.config import db_username as username, db_password, db_host, db_port, db_name, is_development
+from src.config import is_development, connection_string
 import logging
 
-
-database_url = f"postgresql+psycopg2://{username}:{db_password}@{db_host}:{db_port}/{db_name}"
-
-engine = create_engine(database_url, echo=is_development)
+engine = create_engine(connection_string, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -17,8 +14,8 @@ def init_db():
     try:
         db_initialized = False
 
-        if not database_exists(database_url):
-            create_database(database_url)
+        if not database_exists(connection_string):
+            create_database(connection_string)
             db_initialized = True
             logging.log(logging.INFO, "Database created")
 

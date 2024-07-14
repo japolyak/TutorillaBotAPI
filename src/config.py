@@ -10,9 +10,5 @@ my_tg_id = int(os.getenv("MY_TG_ID") or 0)
 admin_tg_id = int(os.getenv("ADMIN_TG_ID") or 0)
 
 # Database
-db_username = os.getenv(f"DB_USER")
-db_password = os.getenv(f"DB_PASSWORD")
-db_host = os.getenv(f"DB_HOST")
-db_port = int(os.getenv("DB_PORT") or 5432)
-db_name = os.getenv(f"DB_NAME")
+connection_string = os.getenv("CONNECTION_STRING") or ''
 db_initialized = False
