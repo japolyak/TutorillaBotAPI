@@ -3,12 +3,17 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from src import config
 from src.database import db_setup
+from src.logger.logger import Logger
 from src.routers import admin, user, subject, private_course, tutor_course, web_app, test
 
 
 logging.basicConfig(encoding='utf-8', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 logging.info(msg="Starting app...")
+
+logger = Logger()
+logger.loger.info(msg="Logger initialized")
+
 app = FastAPI()
 
 allow_origins = config.allowed_origins.split('&')
