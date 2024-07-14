@@ -21,17 +21,17 @@ def init_db():
         if not database_exists(connection_string):
             create_database(connection_string)
             db_initialized = True
-            logging.log(logging.INFO, "Database created")
+            logging.info(msg="Database created")
 
         Base.metadata.create_all(bind=engine)
-        logging.log(logging.INFO, "Tables created")
+        logging.info(msg="Tables created")
 
         if db_initialized and is_development:
             insert_mock_data(engine)
-            logging.log(logging.INFO, "Mock data inserted")
+            logging.info(msg="Mock data inserted")
 
     except Exception as e:
-        logging.exception(f"Error while initializing db: {e}")
+        logging.exception(msg=f"Error while initializing db: {e}")
         pass
 
 
