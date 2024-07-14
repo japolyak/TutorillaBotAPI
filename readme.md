@@ -11,22 +11,24 @@ The API is built using `FastAPI` for creating endpoints, `Pydantic` for data val
 
 The application uses a `PostgreSQL` database hosted on a `Google Cloud` virtual machine located in the North America region.
 This choice was based on financial considerations. Due to the database's location, requests to the database may take slightly longer than usual.
-To mitigate this, some requests are made (and others will be rewritten) as transactions or functions to reduce the number of database requests.
+To mitigate this, some requests are made (and others will be rewritten) as transactions and functions to reduce the number of database requests.
 
-## Deployment
+## Environment variables
 
-The app runs on Docker containers and uses Google Cloud Platform for reliability and scalability.
-It requires the following environment variables for service configuration:
+In development, the app uses a `.env` file to store environment variables. The file should be located in the root directory of the project.
+In production app runs on Docker containers and uses Google Cloud Platform for reliability and scalability.
+Application requires the following environment variables for service configuration:
 
-Main variables:
+Environment variables:
 * `ALLOWED_ORIGINS` - list of divided by `&` allowed origins for CORS.
-* `IS_DEVELOPMENT` - determines development or production environment - `True` or `False`.
+* `IS_DEVELOPMENT` - determines development or production environment - `True` or `False`. Not required in production.
 
 Telegram related variables:
 
 * `BOT_TOKEN` - bot token
 * `ADMIN_TG_ID` - bot admin telegram id
-* `MY_TG_ID` - developer telegram id for debugging - not required in production
+* `MY_TG_ID` - developer telegram id for debugging. Not required in production
 
 Database related variables:
-* `CONNECTION_STRING` - db connection string in format `dialect+driver://username:password@host:port/database`. Current implementation uses `postgresql+psycopg2` dialect and driver.
+* `CONNECTION_STRING` - db connection string in format `dialect+driver://username:password@host:port/database`.
+Current implementation uses `postgresql+psycopg2` dialect and driver.
