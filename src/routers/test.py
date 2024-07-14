@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from src.config import connection_string
 from src.routers.api_enpoints import APIEndpoints
 
 
@@ -7,4 +8,4 @@ router = APIRouter(prefix=APIEndpoints.Test.Prefix, tags=["test"])
 
 @router.get(APIEndpoints.Test.Get)
 async def root():
-    return {"message": "Hello World!"}
+    return {"message": f"{connection_string}"}
