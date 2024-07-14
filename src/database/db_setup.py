@@ -14,7 +14,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def init_db():
-    logging.error(f"Connection string test: {connection_string}")
+    logging.log(logging.INFO, f"Connection string test: {connection_string}")
 
     try:
         db_initialized = False
