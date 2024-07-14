@@ -11,4 +11,3 @@ admin_tg_id = int(os.getenv("ADMIN_TG_ID") or 0)
 
 # Database
 connection_string = os.getenv("CONNECTION_STRING") or ''
-db_initialized = False

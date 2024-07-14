@@ -29,8 +29,4 @@ Telegram related variables:
 * `MY_TG_ID` - developer telegram id for debugging - not required in production
 
 Database related variables:
-* `DB_USER` - db user
-* `DB_PASSWORD` - db password
-* `DB_HOST` - db host
-* `DB_NAME` - db name
-* `DB_PORT` - db port
+* `CONNECTION_STRING` - db connection string in format `dialect+driver://username:password@host:port/database`. Current implementation uses `postgresql+psycopg2` dialect and driver.
