@@ -1,4 +1,3 @@
-import logging
 from fastapi import status, Depends, APIRouter
 from src.models import UserDto, UserBaseDto, Role
 from src.database.crud import user_crud
@@ -21,8 +20,6 @@ router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
     summary="Gets user by id"
 )
 async def get_user(user_id: int, db: Session = Depends(session)):
-    logging.error(f"Getting user with id: {user_id}")
-
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
     if db_user is None:
