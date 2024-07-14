@@ -3,8 +3,12 @@ from sqlalchemy_utils import database_exists, create_database
 from src.database.models import Base
 from sqlalchemy.orm import sessionmaker
 from src.database.mockdata import insert_mock_data
-from src.config import is_development, connection_string
+from src.config import db_username as username, db_password, db_host, db_port, db_name, is_development, connection_string
 import logging
+
+
+# connection_string = f"postgresql+psycopg2://{username}:{db_password}@{db_host}:{db_port}/{db_name}"
+
 
 engine = create_engine(connection_string, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

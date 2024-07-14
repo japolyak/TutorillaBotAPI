@@ -14,3 +14,8 @@ admin_tg_id = int(os.getenv("ADMIN_TG_ID", 0))
 
 # Database
 connection_string = os.getenv("CONNECTION_STRING", "")
+db_username = os.getenv(f"DB_USER")
+db_password = os.getenv(f"DB_PASSWORD")
+db_host = os.getenv(f"DB_HOST")
+db_port = int(os.getenv("DB_PORT") or 5432)
+db_name = os.getenv(f"DB_NAME")
