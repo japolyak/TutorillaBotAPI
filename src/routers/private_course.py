@@ -13,7 +13,7 @@ from src.models import (PaginatedList, NewClassDto, ClassDto, Role, PrivateCours
                         PrivateClassDto)
 
 
-router = APIRouter(prefix=APIEndpoints.PrivateCourses.Prefix, tags=["private-courses"])
+router = APIRouter()
 
 
 @router.get(path=APIEndpoints.PrivateCourses.GetClasses, status_code=status.HTTP_200_OK,

@@ -10,7 +10,7 @@ from src.builders.response_builder import ResponseBuilder
 from src.routers.api_enpoints import APIEndpoints
 
 
-router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
+router = APIRouter()
 
 
 @router.get(

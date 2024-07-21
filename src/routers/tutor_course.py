@@ -7,7 +7,7 @@ from src.builders.response_builder import ResponseBuilder
 from src.routers.api_enpoints import APIEndpoints
 
 
-router = APIRouter(prefix=APIEndpoints.TutorCourse.Prefix, tags=["tutor-courses"])
+router = APIRouter()
 
 
 @router.post(path=APIEndpoints.TutorCourse.AddCourse, status_code=status.HTTP_201_CREATED,

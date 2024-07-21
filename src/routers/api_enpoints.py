@@ -33,6 +33,6 @@ class APIEndpoints:
         Prefix = "/auth"
         Me = "/me/"
 
-    class Test:
-        Prefix = "/test"
+    class Home:
+        Prefix = "/home"
         Get: str = "/"

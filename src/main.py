@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import logging
 from src import config
 from src.database import db_setup
-from src.routers import admin, user, subject, private_course, tutor_course, web_app, test
+from .api import authenticated_api_router as api_router
 
 
 logging.basicConfig(encoding='utf-8', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
@@ -27,11 +27,5 @@ db_setup.init_db()
 logging.info(msg="Finished db initialization...")
 
 logging.info(msg="Start routers initialization...")
-app.include_router(test.router)
-app.include_router(admin.router)
-app.include_router(private_course.router)
-app.include_router(subject.router)
-app.include_router(tutor_course.router)
-app.include_router(user.router)
-app.include_router(web_app.router)
+app.include_router(api_router)
 logging.info(msg="Finish routers initialization...")
