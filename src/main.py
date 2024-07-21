@@ -24,9 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-log.warning(msg="Start db initialization...")
 db_setup.init_db()
-log.warning(msg="Finished db initialization...")
 
 log.warning(msg="Start routers initialization...")
 app.include_router(api_router)
