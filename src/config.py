@@ -13,9 +13,9 @@ my_tg_id = int(os.getenv("MY_TG_ID", 0))
 admin_tg_id = int(os.getenv("ADMIN_TG_ID", 0))
 
 # Database
-connection_string = os.getenv("CONNECTION_STRING", "")
-db_username = os.getenv(f"DB_USER")
-db_password = os.getenv(f"DB_PASSWORD")
-db_host = os.getenv(f"DB_HOST")
-db_port = int(os.getenv("DB_PORT") or 5432)
-db_name = os.getenv(f"DB_NAME")
+_database_username = os.getenv(f"DB_USER")
+_database_password = os.getenv(f"DB_PASSWORD")
+database_host = os.getenv(f"DB_HOST")
+database_port = int(os.getenv("DB_PORT") or 5432)
+database_name = os.getenv(f"DB_NAME")
+sqlalchemy_database_uri = f"postgresql+psycopg2://{_database_username}:{_database_password}@{database_host}:{database_port}/{database_name}"
