@@ -35,4 +35,4 @@ class APIEndpoints:
 
     class Test:
         Prefix = "/test"
-        Post: str = "/"
+        Get: str = "/"

@@ -8,7 +8,8 @@ from src.routers import admin, user, subject, private_course, tutor_course, web_
 
 logging.basicConfig(encoding='utf-8', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
-logging.log(logging.INFO, "Starting app...")
+logging.info(msg="Starting app...")
+
 app = FastAPI()
 
 allow_origins = config.allowed_origins.split('&')
@@ -21,10 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-logging.log(logging.INFO, "Start db initialization...")
+logging.info(msg="Start db initialization...")
 db_setup.init_db()
-logging.log(logging.INFO, "Finished db initialization...")
+logging.info(msg="Finished db initialization...")
 
+logging.info(msg="Start routers initialization...")
 app.include_router(test.router)
 app.include_router(admin.router)
 app.include_router(private_course.router)
@@ -32,3 +34,4 @@ app.include_router(subject.router)
 app.include_router(tutor_course.router)
 app.include_router(user.router)
 app.include_router(web_app.router)
+logging.info(msg="Finish routers initialization...")

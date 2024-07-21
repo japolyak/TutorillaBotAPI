@@ -1,18 +1,21 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # App
-allowed_origins = os.getenv("ALLOWED_ORIGINS") or ''
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173&http://127.0.0.1:4040&http://127.0.0.1:5173&http://localhost:4040")
+is_development = os.getenv("IS_DEVELOPMENT", "False") == "True"
 
 # Telegram
-bot_token = os.getenv("BOT_TOKEN") or ''
-my_tg_id = int(os.getenv("MY_TG_ID") or 0)
-admin_tg_id = int(os.getenv("ADMIN_TG_ID") or 0)
+bot_token = os.getenv("BOT_TOKEN", "")
+my_tg_id = int(os.getenv("MY_TG_ID", 0))
+admin_tg_id = int(os.getenv("ADMIN_TG_ID", 0))
 
 # Database
-is_development = os.getenv("IS_DEVELOPMENT") == "True"
-db_username = os.getenv(f"DB_USER")
-db_password = os.getenv(f"DB_PASSWORD")
-db_host = os.getenv(f"DB_HOST")
-db_port = int(os.getenv("DB_PORT") or 5432)
-db_name = os.getenv(f"DB_NAME")
-db_initialized = False
+_database_username = os.getenv(f"DB_USER")
+_database_password = os.getenv(f"DB_PASSWORD")
+database_host = os.getenv(f"DB_HOST")
+database_port = int(os.getenv("DB_PORT") or 5432)
+database_name = os.getenv(f"DB_NAME")
+sqlalchemy_database_uri = f"postgresql+psycopg2://{_database_username}:{_database_password}@{database_host}:{database_port}/{database_name}"

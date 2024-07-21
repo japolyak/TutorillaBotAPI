@@ -3,13 +3,11 @@ from sqlalchemy_utils import database_exists, create_database
 from src.database.models import Base
 from sqlalchemy.orm import sessionmaker
 from src.database.mockdata import insert_mock_data
-from src.config import db_username as username, db_password, db_host, db_port, db_name, is_development
+from src.config import is_development, sqlalchemy_database_uri
 import logging
 
 
-database_url = f"postgresql+psycopg2://{username}:{db_password}@{db_host}:{db_port}/{db_name}"
-
-engine = create_engine(database_url, echo=is_development)
+engine = create_engine(sqlalchemy_database_uri, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -17,20 +15,20 @@ def init_db():
     try:
         db_initialized = False
 
-        if not database_exists(database_url):
-            create_database(database_url)
+        if not database_exists(sqlalchemy_database_uri):
+            create_database(sqlalchemy_database_uri)
             db_initialized = True
-            logging.log(logging.INFO, "Database created")
+            logging.info(msg="Database created")
 
         Base.metadata.create_all(bind=engine)
-        logging.log(logging.INFO, "Tables created")
+        logging.info(msg="Tables created")
 
         if db_initialized and is_development:
             insert_mock_data(engine)
-            logging.log(logging.INFO, "Mock data inserted")
+            logging.info(msg="Mock data inserted")
 
     except Exception as e:
-        logging.exception(f"Error while initializing db: {e}")
+        logging.exception(msg=f"Error while initializing db: {e}")
         pass
 
 

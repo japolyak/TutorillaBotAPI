@@ -13,7 +13,12 @@ from src.routers.api_enpoints import APIEndpoints
 router = APIRouter(prefix=APIEndpoints.Users.Prefix, tags=["users"])
 
 
-@router.get(path=APIEndpoints.Users.GetUser, status_code=status.HTTP_200_OK, response_model=UserDto, summary="Gets user by id")
+@router.get(
+    path=APIEndpoints.Users.GetUser,
+    status_code=status.HTTP_200_OK,
+    response_model=UserDto,
+    summary="Gets user by id"
+)
 async def get_user(user_id: int, db: Session = Depends(session)):
     db_user = user_crud.get_user(db=db, user_id=user_id)
 
