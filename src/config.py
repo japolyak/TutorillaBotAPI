@@ -1,7 +1,10 @@
 import os
 from dotenv import load_dotenv
+import logging
 
 load_dotenv()
+
+log_level = os.getenv("LOG_LEVEL", "DEBUG")
 
 # App
 allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173&http://127.0.0.1:4040&http://127.0.0.1:5173&http://localhost:4040")

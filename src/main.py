@@ -4,11 +4,13 @@ import logging
 from src import config
 from src.database import db_setup
 from .api import authenticated_api_router as api_router
+from .logging import configure_logging
 
+log = logging.getLogger(__name__)
 
-logging.basicConfig(encoding='utf-8', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
+configure_logging()
 
-logging.info(msg="Starting app...")
+log.warning(msg="Starting app...")
 
 app = FastAPI()
 
@@ -22,10 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-logging.info(msg="Start db initialization...")
+log.warning(msg="Start db initialization...")
 db_setup.init_db()
-logging.info(msg="Finished db initialization...")
+log.warning(msg="Finished db initialization...")
 
-logging.info(msg="Start routers initialization...")
+log.warning(msg="Start routers initialization...")
 app.include_router(api_router)
-logging.info(msg="Finish routers initialization...")
+log.warning(msg="Finish routers initialization...")
