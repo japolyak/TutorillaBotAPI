@@ -21,4 +21,4 @@ _database_password = os.getenv(f"DB_PASSWORD")
 database_host = os.getenv(f"DB_HOST")
 database_port = int(os.getenv("DB_PORT") or 5432)
 database_name = os.getenv(f"DB_NAME")
-sqlalchemy_database_uri = f"postgresql+psycopg2://{_database_username}:{_database_password}@{database_host}:{database_port}/{database_name}"
+sqlalchemy_database_url = f"postgresql+psycopg2://{_database_username}:{_database_password}@{database_host}:{database_port}/{database_name}"

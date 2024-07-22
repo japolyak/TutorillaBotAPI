@@ -3,11 +3,11 @@ from sqlalchemy_utils import database_exists, create_database
 from src.database.models import Base
 from sqlalchemy.orm import sessionmaker
 from src.database.mockdata import insert_mock_data
-from src.config import is_development, sqlalchemy_database_uri
+from src.config import is_development, sqlalchemy_database_url
 import logging
 
 
-engine = create_engine(sqlalchemy_database_uri, echo=is_development)
+engine = create_engine(sqlalchemy_database_url, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -15,8 +15,8 @@ def init_db():
     try:
         db_initialized = False
 
-        if not database_exists(sqlalchemy_database_uri):
-            create_database(sqlalchemy_database_uri)
+        if not database_exists(sqlalchemy_database_url):
+            create_database(sqlalchemy_database_url)
             db_initialized = True
             logging.info(msg="Database created")
 

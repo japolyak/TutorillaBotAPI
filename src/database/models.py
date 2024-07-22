@@ -110,3 +110,11 @@ class PrivateClass(Base):
     is_paid: Mapped[bool] = mapped_column(Boolean, server_default="false")
 
     private_course: Mapped["PrivateCourse"] = relationship(back_populates="private_classes")
+
+
+class Test(Base):
+    __tablename__ = "test"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(255), unique=True)
+
