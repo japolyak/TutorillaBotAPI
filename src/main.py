@@ -1,33 +1,31 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import logging
+
 from src import config
-from src.database import db_setup
-from .api import authenticated_api_router as api_router
-from .logging import configure_logging
+from src.database.db_setup import initialize_database
+
+from src.api import api_router
+from src.logging import configure_logging
+
 
 log = logging.getLogger(__name__)
 
+# Logging level and format configuration
 configure_logging()
 
-log.warning(msg="Starting app...")
+log.info(msg="Starting app...")
 
 app = FastAPI()
 
-allow_origins = config.allowed_origins.split('&')
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allow_origins,
+    allow_origins=config.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-log.warning(msg="Start db initialization...")
-db_setup.init_db()
-log.warning(msg="Finished db initialization...")
-
-log.warning(msg="Start routers initialization...")
+initialize_database()
 app.include_router(api_router)
-log.warning(msg="Finish routers initialization...")
