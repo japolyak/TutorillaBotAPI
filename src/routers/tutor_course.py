@@ -7,7 +7,7 @@ from src.builders.response_builder import ResponseBuilder
 from src.routers.api_enpoints import APIEndpoints
 
 
-router = APIRouter(prefix=APIEndpoints.TutorCourse.Prefix, tags=["tutor-courses"])
+router = APIRouter()
 
 
 @router.post(path=APIEndpoints.TutorCourse.AddCourse, status_code=status.HTTP_201_CREATED,
@@ -28,7 +28,7 @@ async def get_available_tutor_courses(user_id: int, subject_name: str, db: Sessi
         return ResponseBuilder.success_response(content=ItemsDto(items=[]))
 
     tutor_courses = [
-        TutorCourseInlineDto(id=tc[0], price=tc[1], subject_name=tc[3], tutor_name=tc[4]) for tc in db_tutor_courses
+        TutorCourseInlineDto(id=tc[0], price=tc[1], subject_name=tc[2], tutor_name=tc[3]) for tc in db_tutor_courses
     ]
 
     response_model = ItemsDto[TutorCourseInlineDto](items=tutor_courses)

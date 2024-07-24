@@ -8,7 +8,7 @@ from src.builders.response_builder import ResponseBuilder
 from src.routers.api_enpoints import APIEndpoints
 
 
-router = APIRouter(prefix=APIEndpoints.Subjects.Prefix, tags=["subjects"])
+router = APIRouter()
 
 
 @router.get(path=APIEndpoints.Subjects.Get, status_code=status.HTTP_200_OK,

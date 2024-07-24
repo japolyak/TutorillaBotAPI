@@ -9,7 +9,7 @@ from typing import Literal
 from src.routers.api_enpoints import APIEndpoints
 
 
-router = APIRouter(prefix=APIEndpoints.Admin.Prefix, tags=["admin"])
+router = APIRouter()
 
 
 @router.get(path=APIEndpoints.Admin.GetRequests, status_code=status.HTTP_200_OK, response_model=ItemsDto[UserRequestDto],

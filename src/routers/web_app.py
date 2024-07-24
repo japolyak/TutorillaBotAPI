@@ -10,7 +10,7 @@ from src.builders.response_builder import ResponseBuilder
 from src.routers.api_enpoints import APIEndpoints
 
 
-router = APIRouter(prefix=APIEndpoints.WebApp.Prefix, tags=["web_app_authorization"])
+router = APIRouter()
 
 
 @router.get(path=APIEndpoints.WebApp.Me, status_code=status.HTTP_200_OK, response_model=UserDto,
