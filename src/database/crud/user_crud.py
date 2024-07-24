@@ -1,22 +1,22 @@
 from sqlalchemy.orm import Session
 from src.database.models import User, UserRequest
-from typing import Literal
+from typing import Literal, Optional
 from src.models import Role
 
 
-def get_user(db: Session, user_id: int):
-    query = db.query(User).filter(User.id == user_id)
+def get_user(db: Session, user_id: int) -> Optional[User]:
+    query = db.query(User).filter(user_id == User.id).one_or_none()
 
-    return query.first()
+    return query
 
 
 def accept_role_request(db: Session, user_id: int, role: Literal[Role.Tutor, Role.Student]):
-    db_user_request = db.query(UserRequest).filter(UserRequest.user_id == user_id).first()
+    db_user_request = db.query(UserRequest).filter(user_id == UserRequest.user_id).first()
 
     if db_user_request is None:
         return None
 
-    db_user = db.query(User).filter(User.id == user_id).first()
+    db_user = db.query(User).filter(user_id == User.id).first()
 
     if not db_user:
         return None
@@ -36,7 +36,7 @@ def accept_role_request(db: Session, user_id: int, role: Literal[Role.Tutor, Rol
 
 
 def decline_role_request(db: Session, user_id: int) -> bool:
-    db_user_request = db.query(UserRequest).filter(UserRequest.user_id == user_id).first()
+    db_user_request = db.query(UserRequest).filter(user_id == UserRequest.user_id).first()
 
     if db_user_request is None:
         return False
