@@ -30,6 +30,7 @@ def version_schema():
 
 
 def initialize_database():
+    log.info(msg="Database init...")
     try:
         db_initialized = False
 
