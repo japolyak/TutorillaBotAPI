@@ -26,7 +26,7 @@ def version_schema():
 
     alembic_cfg = AlembicConfig(alembic_ini_path)
     alembic_cfg.set_main_option("script_location", script_location)
-    alembic_command.stamp(alembic_cfg, "head")
+    alembic_command.upgrade(alembic_cfg, "head")
 
 
 def initialize_database():
@@ -38,7 +38,7 @@ def initialize_database():
             db_initialized = True
             log.info(msg="Database created")
 
-        Base.metadata.create_all(bind=engine)
+            Base.metadata.create_all(bind=engine)
 
         version_schema()
 
