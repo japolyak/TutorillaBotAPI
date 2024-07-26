@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from src.database.models import User, UserRequest
-from typing import Literal
+from typing import Literal, Optional
 from src.models import Role
 
 
-def get_user(db: Session, user_id: int):
-    query = db.query(User).filter(user_id == User.id)
+def get_user(db: Session, user_id: int) -> Optional[User]:
+    query = db.query(User).filter(user_id == User.id).one_or_none()
 
-    return query.first()
+    return query
 
 
 def accept_role_request(db: Session, user_id: int, role: Literal[Role.Tutor, Role.Student]):
