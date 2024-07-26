@@ -26,6 +26,6 @@ def get_user_request(db: Session, request_id: int):
 
     query = (db.query(UserRequest.id, User.id, User.first_name, User.last_name, User.email, requested_role)
              .join(UserRequest.user)
-             .filter(UserRequest.id == request_id))
+             .filter(request_id == UserRequest.id))
 
     return query.first()

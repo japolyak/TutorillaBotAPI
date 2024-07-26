@@ -6,12 +6,12 @@ from src.database.models import TutorCourse, Subject, PrivateCourse
 def get_student_subjects(db: Session, user_id: int, available: bool):
     sub_query = (select(1)
                  .select_from(PrivateCourse)
-                 .filter(PrivateCourse.course_id == TutorCourse.id, PrivateCourse.student_id == user_id)
+                 .filter(PrivateCourse.course_id == TutorCourse.id, user_id == PrivateCourse.student_id)
                  .exists())
 
     query = (db.query(Subject)
              .join(Subject.tutor_courses)
-             .filter(TutorCourse.tutor_id != user_id,
+             .filter(user_id != TutorCourse.tutor_id,
                      ~sub_query if available else sub_query))
 
     if available:
@@ -23,7 +23,7 @@ def get_student_subjects(db: Session, user_id: int, available: bool):
 def get_tutor_subjects(db: Session, user_id: int, available: bool):
     sub_query = (select(1)
                  .select_from(TutorCourse)
-                 .filter(TutorCourse.tutor_id == user_id, TutorCourse.subject_id == Subject.id)
+                 .filter(user_id == TutorCourse.tutor_id, TutorCourse.subject_id == Subject.id)
                  .exists())
 
     query = db.query(Subject).filter(~sub_query if available else sub_query)

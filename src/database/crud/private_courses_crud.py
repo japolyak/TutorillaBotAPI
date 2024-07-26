@@ -15,8 +15,8 @@ def get_private_course_classes_for_month(db: Session, course_id: int, month: int
                    else_=literal_column(f"'{ClassStatus.Scheduled}'")))
 
     query = (db.query(PrivateClass.schedule_datetime, status)
-             .filter(
-        PrivateClass.private_course_id == course_id,
+    .filter(
+        course_id == PrivateClass.private_course_id,
         PrivateClass.schedule_datetime >= start_date,
         PrivateClass.schedule_datetime <= finish_date))
 
@@ -27,12 +27,12 @@ def get_private_courses(db: Session, user_id: int, subject_name: str, role: Lite
     query = (db.query(PrivateCourse.id, Subject.name, User.first_name)
              .join(PrivateCourse.course)
              .join(TutorCourse.subject)
-             .filter(Subject.name == subject_name))
+             .filter(subject_name == Subject.name))
 
     if role == Role.Student:
-        query = query.join(TutorCourse.tutor).filter(PrivateCourse.student_id == user_id)
+        query = query.join(TutorCourse.tutor).filter(user_id == PrivateCourse.student_id)
     else:
-        query = query.join(PrivateCourse.student).filter(TutorCourse.tutor_id == user_id)
+        query = query.join(PrivateCourse.student).filter(user_id == TutorCourse.tutor_id)
 
     return query.all()
 
@@ -42,15 +42,15 @@ def get_private_course_by_course_id(db: Session, private_course_id: int):
         db.query(PrivateCourse)
         .options(
             joinedload(PrivateCourse.student),
-                  joinedload(PrivateCourse.course).joinedload(TutorCourse.tutor),
-                  joinedload(PrivateCourse.course).joinedload(TutorCourse.subject))
-        .filter(PrivateCourse.id == private_course_id))
+            joinedload(PrivateCourse.course).joinedload(TutorCourse.tutor),
+            joinedload(PrivateCourse.course).joinedload(TutorCourse.subject))
+        .filter(private_course_id == PrivateCourse.id))
 
     return query.first()
 
 
 def enroll_student_to_course(db: Session, user_id: int, course_id: int):
-    db_course = db.query(TutorCourse).filter(TutorCourse.id == course_id).first()
+    db_course = db.query(TutorCourse).filter(course_id == TutorCourse.id).first()
 
     db_course = PrivateCourse(student_id=user_id, course_id=course_id, price=db_course.price)
     db.add(db_course)
