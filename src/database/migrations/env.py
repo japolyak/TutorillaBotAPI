@@ -1,10 +1,9 @@
 import sys
 import os
 
-from alembic import context, script
+from alembic import context
 
-from alembic.runtime import migration
-from sqlalchemy import engine_from_config, pool, Engine
+from sqlalchemy import engine_from_config, pool
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
@@ -25,14 +24,6 @@ log = logging.getLogger(__name__)
 target_metadata = Base.metadata
 
 
-def is_migration_pending(engine: Engine) -> bool:
-    script_ = script.ScriptDirectory.from_config(config)
-
-    with engine.begin() as conn:
-        context_ = migration.MigrationContext.configure(conn)
-        return context_.get_current_revision() != script_.get_current_head()
-
-
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
@@ -43,10 +34,6 @@ def run_migrations_online() -> None:
     connectable = engine_from_config(
         config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
     )
-
-    if not is_migration_pending(connectable):
-        log.info('No migrations needed. Database is up to date.')
-        return
 
     log.info("Migrating...")
     with connectable.connect() as connection:

@@ -10,13 +10,13 @@ def get_user(db: Session, user_id: int) -> Optional[User]:
     return query
 
 
-def accept_role_request(db: Session, user_id: int, role: Literal[Role.Tutor, Role.Student]):
-    db_user_request = db.query(UserRequest).filter(user_id == UserRequest.user_id).first()
+def accept_role_request(db: Session, user_id: int, role: Literal[Role.Tutor, Role.Student]) -> Optional[User]:
+    db_user_request = db.query(UserRequest).filter(user_id == UserRequest.user_id).one_or_none()
 
     if db_user_request is None:
         return None
 
-    db_user = db.query(User).filter(user_id == User.id).first()
+    db_user: Optional[User] = db.query(User).filter(user_id == User.id).one_or_none()
 
     if not db_user:
         return None
