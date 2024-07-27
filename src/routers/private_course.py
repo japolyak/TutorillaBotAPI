@@ -38,11 +38,13 @@ async def get_classes_for_bot(course_id: int, user_id: int, role: Literal[Role.T
         private_class = PrivateClassDto(id=row[0], schedule_datetime=new_time, status=row[4])
         classes.append(private_class)
 
+    pages = total_count // 3 + (0 if total_count % 3 == 0 else 1)
+
     response_model = PaginatedList[PrivateClassDto](
         items=classes,
         total=total_count,
         current_page=page,
-        pages=1 + total_count // 3)
+        pages=pages)
 
     return ResponseBuilder.success_response(content=response_model)
 
