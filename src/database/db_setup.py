@@ -31,18 +31,16 @@ def version_schema():
 
 def initialize_database():
     try:
-        db_initialized = False
+        if database_exists(sqlalchemy_database_url):
+            version_schema()
+            return
 
-        if not database_exists(sqlalchemy_database_url):
-            create_database(sqlalchemy_database_url)
-            db_initialized = True
-            log.info(msg="Database created")
+        create_database(sqlalchemy_database_url)
+        log.info(msg="Database created")
 
-            Base.metadata.create_all(bind=engine)
+        Base.metadata.create_all(bind=engine)
 
-        version_schema()
-
-        if db_initialized and is_development:
+        if is_development:
             insert_mock_data(engine)
             log.info(msg="Mock data inserted")
 
