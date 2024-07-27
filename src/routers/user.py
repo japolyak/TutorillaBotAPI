@@ -53,7 +53,8 @@ async def register_user(user: UserBaseDto, db: Session = Depends(session)):
         else ResponseBuilder.error_response(message='User addition was not successful')
 
 
-@router.post(path=APIEndpoints.Users.ApplyRole, status_code=status.HTTP_201_CREATED)
+@router.post(path=APIEndpoints.Users.ApplyRole, status_code=status.HTTP_201_CREATED,
+             summary="Applies user's request for a role")
 async def apply_for_role(user_id: int, role: Literal[Role.Student, Role.Tutor], db: Session = Depends(session)):
     params = {
         'u_id': user_id,

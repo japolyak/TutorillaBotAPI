@@ -111,7 +111,7 @@ async def add_new_class(private_course_id: int, role: Literal[Role.Tutor, Role.S
     recipient_id, recipient_timezone, sender_name, subject_name, error_msg = result_row
 
     if error_msg:
-        return ResponseBuilder.error_response(message='Class addition was not successful')
+        return ResponseBuilder.error_response(message=error_msg)
 
     class_date = transform_class_time(schedule, recipient_timezone).strftime('%H:%M %d-%m-%Y')
 
