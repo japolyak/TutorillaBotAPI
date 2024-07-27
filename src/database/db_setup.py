@@ -12,7 +12,6 @@ from sqlalchemy_utils import database_exists, create_database
 
 from src.config import is_development, sqlalchemy_database_url
 from src.database.mockdata import insert_mock_data
-from src.database.models import Base
 
 
 log = logging.getLogger(__name__)
@@ -58,9 +57,7 @@ def initialize_database():
         create_database(sqlalchemy_database_url)
         log.info(msg="Database created")
 
-        Base.metadata.create_all(bind=engine)
-
-        alembic_command.stamp(get_alembic_config(), "head")
+        migrate(engine)
 
         if is_development:
             insert_mock_data(engine)
