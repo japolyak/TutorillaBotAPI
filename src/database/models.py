@@ -43,7 +43,7 @@ class UserRequest(Base):
     tutor_role: Mapped[bool] = mapped_column(Boolean, server_default="false")
     student_role: Mapped[bool] = mapped_column(Boolean, server_default="false")
 
-    user: Mapped["User"] = relationship("User", back_populates="user_request", lazy='dynamic')
+    user: Mapped["User"] = relationship("User", back_populates="user_request")
 
 
 class Subject(Base):

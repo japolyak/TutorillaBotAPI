@@ -43,10 +43,17 @@ def insert_mock_data(engine: Engine):
         polish = Subject(name="Polish")
         english = Subject(name="English")
 
+        session.add_all([user1, user2, user3, user4, user5, user6, artem, admin])
+        session.add_all([polish, english])
+        session.commit()
+
         tutor_course1 = TutorCourse(tutor_id=user1.id, subject_id=polish.id, price=10)
         tutor_course2 = TutorCourse(tutor_id=user2.id, subject_id=english.id, price=10)
         tutor_course3 = TutorCourse(tutor_id=user3.id, subject_id=english.id, price=10)
         tutor_course4 = TutorCourse(tutor_id=my_tg_id, subject_id=english.id, price=10)
+
+        session.add_all([tutor_course1, tutor_course2, tutor_course3, tutor_course4])
+        session.commit()
 
         private_course1 = PrivateCourse(student_id=user4.id, course_id=tutor_course4.id, price=10)
         private_course2 = PrivateCourse(student_id=user5.id, course_id=tutor_course4.id, price=10)
@@ -54,6 +61,9 @@ def insert_mock_data(engine: Engine):
         private_course4 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course1.id, price=10)
         private_course5 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course2.id, price=10)
         private_course6 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course3.id, price=10)
+
+        session.add_all([private_course1, private_course2, private_course3, private_course4, private_course5, private_course6])
+        session.commit()
 
         source_one = SourceDto(title="Assignment 1", assignment="Do this").model_dump_json()
         source_two = SourceDto(title="Assignment 2", assignment="Do this again").model_dump_json()
@@ -69,10 +79,5 @@ def insert_mock_data(engine: Engine):
         private_class5 = PrivateClass(private_course_id=private_course4.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True)
         private_class6 = PrivateClass(private_course_id=private_course4.id, schedule_datetime="2021-06-01 12:00:00", assignment=assignments, is_scheduled=True, has_occurred=True)
 
-        session.add_all([user1, user2, user3, user4, user5, user6, artem, admin])
-        session.add_all([polish, english])
-        session.add_all([tutor_course1, tutor_course2, tutor_course3, tutor_course4])
-        session.add_all([private_course1, private_course2, private_course3, private_course4, private_course5, private_course6])
         session.add_all([private_class1, private_class2, private_class3, private_class4, private_class5, private_class6])
-
         session.commit()
