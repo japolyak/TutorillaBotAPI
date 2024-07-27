@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import Engine
-from src.database.models import User, Subject, TutorCourse, PrivateCourse, PrivateClass
+from src.database.models import User, Subject, TutorCourse, PrivateCourse, PrivateClass, Textbook
 from src.models import SourceDto
 from src.config import my_tg_id, admin_tg_id
 
@@ -53,6 +53,15 @@ def insert_mock_data(engine: Engine):
         tutor_course4 = TutorCourse(tutor_id=my_tg_id, subject_id=english.id, price=10)
 
         session.add_all([tutor_course1, tutor_course2, tutor_course3, tutor_course4])
+        session.commit()
+
+        hurra_1 = Textbook(title="Hurra po Polsku 1", tutor_course_id=tutor_course1.id)
+        hurra_2 = Textbook(title="Hurra po Polsku 2", tutor_course_id=tutor_course1.id)
+        hurra_3 = Textbook(title="Hurra po Polsku 3", tutor_course_id=tutor_course1.id)
+        umiesz_zdasz = Textbook(title="Umiesz? zdasz!", tutor_course_id=tutor_course1.id)
+        czas_na_czasownik = Textbook(title="Czas na czasownik", tutor_course_id=tutor_course1.id)
+
+        session.add_all([hurra_1, hurra_2, hurra_3, umiesz_zdasz, czas_na_czasownik])
         session.commit()
 
         private_course1 = PrivateCourse(student_id=user4.id, course_id=tutor_course4.id, price=10)
