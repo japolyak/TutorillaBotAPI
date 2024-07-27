@@ -117,6 +117,7 @@ class Textbook(Base):
 
     id: MappedColumn[int] = mapped_column(primary_key=True, index=True)
     title: MappedColumn[str] = mapped_column(String(255))
+    test: MappedColumn[str] = mapped_column(String(255))
     tutor_course_id: MappedColumn[int] = mapped_column(ForeignKey("tutor_courses.id"))
 
     tutor_course: Mapped["TutorCourse"] = relationship("TutorCourse", back_populates="textbooks")
