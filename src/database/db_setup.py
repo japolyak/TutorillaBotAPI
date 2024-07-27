@@ -2,15 +2,17 @@ import os
 import logging
 
 from alembic import command as alembic_command
-from alembic.config import Config as AlembicConfig
+from alembic.config import Config
+from alembic.runtime import migration
+from alembic.script import ScriptDirectory
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 
 from src.config import is_development, sqlalchemy_database_url
-from src.database.models import Base
 from src.database.mockdata import insert_mock_data
+from src.database.models import Base
 
 
 log = logging.getLogger(__name__)
@@ -18,22 +20,33 @@ engine = create_engine(sqlalchemy_database_url, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def migrate():
+def is_migration_pending(engine: Engine, config: Config) -> bool:
+    with engine.begin() as conn:
+        last_applied_version = migration.MigrationContext.configure(conn).get_current_revision()
+        latest_version = ScriptDirectory.from_config(config).get_current_head()
+
+        return last_applied_version != latest_version
+
+
+def migrate(engine: Engine):
     """Applies migrations."""
 
     alembic_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     script_location = alembic_ini_path + "/database/migrations"
 
-    alembic_cfg = AlembicConfig(alembic_ini_path)
+    alembic_cfg = Config(alembic_ini_path)
     alembic_cfg.set_main_option("script_location", script_location)
+
+    if not is_migration_pending(engine, alembic_cfg):
+        return
+
     alembic_command.upgrade(alembic_cfg, "head")
 
 
 def initialize_database():
     try:
         if database_exists(sqlalchemy_database_url):
-            log.info(msg="Applying migrations")
-            migrate()
+            migrate(engine)
             return
 
         create_database(sqlalchemy_database_url)

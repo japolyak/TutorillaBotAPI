@@ -1,6 +1,6 @@
 from sqlalchemy import String, BigInteger, Boolean, ForeignKey, UniqueConstraint, DateTime, Integer, Float
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship, Mapped
+from sqlalchemy.orm import DeclarativeBase, mapped_column, relationship, Mapped, MappedColumn
 from typing import List
 
 
@@ -115,9 +115,9 @@ class PrivateClass(Base):
 class Textbook(Base):
     __tablename__ = "textbooks"
 
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    title: Mapped[str] = mapped_column(String(255))
-    tutor_course_id: Mapped[int] = mapped_column(ForeignKey("tutor_courses.id"))
+    id: MappedColumn[int] = mapped_column(primary_key=True, index=True)
+    title: MappedColumn[str] = mapped_column(String(255))
+    tutor_course_id: MappedColumn[int] = mapped_column(ForeignKey("tutor_courses.id"))
 
     tutor_course: Mapped["TutorCourse"] = relationship("TutorCourse", back_populates="textbooks")
 
