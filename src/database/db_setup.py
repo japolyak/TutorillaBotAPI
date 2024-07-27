@@ -20,6 +20,16 @@ engine = create_engine(sqlalchemy_database_url, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
+def get_alembic_config() -> Config:
+    alembic_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script_location = alembic_ini_path + "/database/migrations"
+
+    alembic_cfg = Config(alembic_ini_path)
+    alembic_cfg.set_main_option("script_location", script_location)
+
+    return alembic_cfg
+
+
 def is_migration_pending(engine: Engine, config: Config) -> bool:
     with engine.begin() as conn:
         last_applied_version = migration.MigrationContext.configure(conn).get_current_revision()
@@ -31,16 +41,12 @@ def is_migration_pending(engine: Engine, config: Config) -> bool:
 def migrate(engine: Engine):
     """Applies migrations."""
 
-    alembic_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    script_location = alembic_ini_path + "/database/migrations"
+    config = get_alembic_config()
 
-    alembic_cfg = Config(alembic_ini_path)
-    alembic_cfg.set_main_option("script_location", script_location)
-
-    if not is_migration_pending(engine, alembic_cfg):
+    if not is_migration_pending(engine, config):
         return
 
-    alembic_command.upgrade(alembic_cfg, "head")
+    alembic_command.upgrade(config, "head")
 
 
 def initialize_database():
@@ -53,6 +59,8 @@ def initialize_database():
         log.info(msg="Database created")
 
         Base.metadata.create_all(bind=engine)
+
+        alembic_command.stamp(get_alembic_config(), "head")
 
         if is_development:
             insert_mock_data(engine)
