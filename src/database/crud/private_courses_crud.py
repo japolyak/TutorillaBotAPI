@@ -25,7 +25,7 @@ def get_private_course_classes_for_month(db: Session, course_id: int, month: int
 
 def get_private_courses(db: Session, user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student]):
     query = (db.query(PrivateCourse.id, Subject.name, User.first_name)
-             .join(PrivateCourse.course)
+             .join(PrivateCourse.tutor_course)
              .join(TutorCourse.subject)
              .filter(subject_name == Subject.name))
 
@@ -42,8 +42,8 @@ def get_private_course_by_course_id(db: Session, private_course_id: int):
         db.query(PrivateCourse)
         .options(
             joinedload(PrivateCourse.student),
-            joinedload(PrivateCourse.course).joinedload(TutorCourse.tutor),
-            joinedload(PrivateCourse.course).joinedload(TutorCourse.subject))
+            joinedload(PrivateCourse.tutor_course).joinedload(TutorCourse.tutor),
+            joinedload(PrivateCourse.tutor_course).joinedload(TutorCourse.subject))
         .filter(private_course_id == PrivateCourse.id))
 
     return query.first()
