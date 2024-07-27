@@ -24,15 +24,15 @@ class User(Base):
     is_admin: Mapped[bool] = mapped_column(Boolean, server_default="false")
 
     tutor_courses: Mapped[List["TutorCourse"]] = relationship(
-        back_populates="tutor", cascade="all, delete-orphan"
+        "TutorCourse", back_populates="tutor", cascade="all, delete-orphan"
     )
 
     private_courses: Mapped[List["PrivateCourse"]] = relationship(
-        back_populates="student", cascade="all, delete-orphan"
+        "PrivateCourse", back_populates="student", cascade="all, delete-orphan"
     )
 
     users_requests: Mapped[List["UserRequest"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
+        "UserRequest", back_populates="user", cascade="all, delete-orphan"
     )
 
 
@@ -45,9 +45,9 @@ class UserRequest(Base):
     tutor_role: Mapped[bool] = mapped_column(Boolean, server_default="false")
     student_role: Mapped[bool] = mapped_column(Boolean, server_default="false")
 
-    user: Mapped["User"] = relationship(back_populates="users_requests")
+    user: Mapped["User"] = relationship("User", back_populates="users_requests")
 
-    UniqueConstraint(user_id, name="unique_user_request")
+    __table_args__ = (UniqueConstraint(user_id, name="unique_user_request"),)
 
 
 class Subject(Base):
@@ -57,7 +57,7 @@ class Subject(Base):
     name: Mapped[str] = mapped_column(String(255), unique=True)
 
     tutor_courses: Mapped[List["TutorCourse"]] = relationship(
-        back_populates="subject", cascade="all, delete-orphan"
+        "TutorCourse", back_populates="subject", cascade="all, delete-orphan"
     )
 
 
@@ -70,17 +70,17 @@ class TutorCourse(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, server_default="true")
     price: Mapped[int] = mapped_column(Integer)
 
-    tutor: Mapped["User"] = relationship(back_populates="tutor_courses")
-    subject: Mapped["Subject"] = relationship(back_populates="tutor_courses")
+    tutor: Mapped["User"] = relationship("User", back_populates="tutor_courses")
+    subject: Mapped["Subject"] = relationship("Subject", back_populates="tutor_courses")
 
-    UniqueConstraint(tutor_id, subject_id, name="unique_tutor_subject")
+    __table_args__ = (UniqueConstraint(tutor_id, subject_id, name="unique_tutor_subject"),)
 
     private_courses: Mapped[List["PrivateCourse"]] = relationship(
-        back_populates="tutor_course", cascade="all, delete-orphan"
+        "PrivateCourse", back_populates="tutor_course", cascade="all, delete-orphan"
     )
 
     textbooks: Mapped[List["Textbook"]] = relationship(
-        back_populates="tutor_course", cascade="all, delete-orphan"
+        "Textbook", back_populates="tutor_course", cascade="all, delete-orphan"
     )
 
 
@@ -92,13 +92,13 @@ class PrivateCourse(Base):
     course_id: Mapped[int] = mapped_column(ForeignKey("tutor_courses.id"))
     price: Mapped[int] = mapped_column(Integer)
 
-    student:Mapped["User"] = relationship(back_populates="private_courses")
-    tutor_course:Mapped["TutorCourse"] = relationship(back_populates="private_courses")
+    student: Mapped["User"] = relationship("User", back_populates="private_courses")
+    tutor_course: Mapped["TutorCourse"] = relationship("TutorCourse", back_populates="private_courses")
 
-    UniqueConstraint(student_id, course_id, name="unique_student_course")
+    __table_args__ = (UniqueConstraint(student_id, course_id, name="unique_student_course"),)
 
     private_classes: Mapped[List["PrivateClass"]] = relationship(
-        back_populates="private_course", cascade="all, delete-orphan"
+        "PrivateClass", back_populates="private_course", cascade="all, delete-orphan"
     )
 
 
@@ -113,7 +113,7 @@ class PrivateClass(Base):
     has_occurred: Mapped[bool] = mapped_column(Boolean, server_default="false")
     is_paid: Mapped[bool] = mapped_column(Boolean, server_default="false")
 
-    private_course: Mapped["PrivateCourse"] = relationship(back_populates="private_classes")
+    private_course: Mapped["PrivateCourse"] = relationship("PrivateCourse", back_populates="private_classes")
 
 
 class Textbook(Base):
@@ -123,6 +123,6 @@ class Textbook(Base):
     title: Mapped[str] = mapped_column(String(255))
     tutor_course_id: Mapped[int] = mapped_column(ForeignKey("tutor_courses.id"))
 
-    tutor_course: Mapped["TutorCourse"] = relationship(back_populates="textbooks")
+    tutor_course: Mapped["TutorCourse"] = relationship("TutorCourse", back_populates="textbooks")
 
-    UniqueConstraint(title, tutor_course_id, name="unique_textbook_tutor_course")
+    __table_args__ = (UniqueConstraint(title, tutor_course_id, name="unique_textbook_tutor_course"),)
