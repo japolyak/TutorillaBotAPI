@@ -18,8 +18,8 @@ engine = create_engine(sqlalchemy_database_url, echo=is_development)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-def version_schema():
-    """Applies alembic versioning."""
+def migrate():
+    """Applies migrations."""
 
     alembic_ini_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     script_location = alembic_ini_path + "/database/migrations"
@@ -32,7 +32,8 @@ def version_schema():
 def initialize_database():
     try:
         if database_exists(sqlalchemy_database_url):
-            version_schema()
+            log.info(msg="Applying migrations")
+            migrate()
             return
 
         create_database(sqlalchemy_database_url)
