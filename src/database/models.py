@@ -31,9 +31,7 @@ class User(Base):
         "PrivateCourse", back_populates="student", cascade="all, delete-orphan"
     )
 
-    users_requests: Mapped[List["UserRequest"]] = relationship(
-        "UserRequest", back_populates="user", cascade="all, delete-orphan"
-    )
+    user_request: Mapped["UserRequest"] = relationship(back_populates="user")
 
 
 class UserRequest(Base):
@@ -45,9 +43,7 @@ class UserRequest(Base):
     tutor_role: Mapped[bool] = mapped_column(Boolean, server_default="false")
     student_role: Mapped[bool] = mapped_column(Boolean, server_default="false")
 
-    user: Mapped["User"] = relationship("User", back_populates="users_requests")
-
-    __table_args__ = (UniqueConstraint(user_id, name="unique_user_request"),)
+    user: Mapped["User"] = relationship(back_populates="user_request")
 
 
 class Subject(Base):
