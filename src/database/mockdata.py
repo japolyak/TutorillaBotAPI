@@ -64,12 +64,12 @@ def insert_mock_data(engine: Engine):
         session.add_all([hurra_1, hurra_2, hurra_3, umiesz_zdasz, czas_na_czasownik])
         session.commit()
 
-        private_course1 = PrivateCourse(student_id=user4.id, course_id=tutor_course4.id, price=10)
-        private_course2 = PrivateCourse(student_id=user5.id, course_id=tutor_course4.id, price=10)
-        private_course3 = PrivateCourse(student_id=user6.id, course_id=tutor_course4.id, price=10)
-        private_course4 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course1.id, price=10)
-        private_course5 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course2.id, price=10)
-        private_course6 = PrivateCourse(student_id=my_tg_id, course_id=tutor_course3.id, price=10)
+        private_course1 = PrivateCourse(student_id=user4.id, tutor_course_id=tutor_course4.id, price=10)
+        private_course2 = PrivateCourse(student_id=user5.id, tutor_course_id=tutor_course4.id, price=10)
+        private_course3 = PrivateCourse(student_id=user6.id, tutor_course_id=tutor_course4.id, price=10)
+        private_course4 = PrivateCourse(student_id=my_tg_id, tutor_course_id=tutor_course1.id, price=10)
+        private_course5 = PrivateCourse(student_id=my_tg_id, tutor_course_id=tutor_course2.id, price=10)
+        private_course6 = PrivateCourse(student_id=my_tg_id, tutor_course_id=tutor_course3.id, price=10)
 
         session.add_all([private_course1, private_course2, private_course3, private_course4, private_course5, private_course6])
         session.commit()
