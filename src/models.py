@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Generic, TypeVar
+from typing import List, Generic, TypeVar, Tuple
 from datetime import datetime
 from enum import StrEnum
 
@@ -113,6 +113,14 @@ class PrivateCourseInlineDto(BaseModel):
     id: int
     person_name: str
     subject_name: str
+    number_of_classes: int
+
+    @classmethod
+    def from_tuple(cls, values: Tuple[int, str, str, int]):
+        if len(values) != 4:
+            raise ValueError("List must contain exactly two elements: [name, age]")
+
+        return cls(id=values[0], person_name=values[1], subject_name=values[2], number_of_classes=values[3])
 
     class Config:
         from_attributes = True

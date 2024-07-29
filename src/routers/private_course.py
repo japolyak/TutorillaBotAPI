@@ -65,12 +65,12 @@ async def get_classes_by_date(private_course_id: int, month: int, year: int, db:
 @router.get(path=APIEndpoints.PrivateCourses.Get, status_code=status.HTTP_200_OK,
             response_model=ItemsDto[PrivateCourseInlineDto], summary="Get private courses for user by subject name")
 async def get_private_courses(user_id: int, subject_name: str, role: Literal[Role.Tutor, Role.Student], db: Session = Depends(session)):
-    db_private_courses = private_courses_crud.get_private_courses(db, user_id, subject_name, role)
+    private_courses = private_courses_crud.get_private_courses(db, user_id, subject_name, role)
 
-    if not db_private_courses:
+    if not private_courses:
         return ResponseBuilder.success_response(content=ItemsDto(items=[]))
 
-    private_courses = [PrivateCourseInlineDto(id=pc[0], person_name=pc[1], subject_name=pc[2]) for pc in db_private_courses]
+    private_courses = [PrivateCourseInlineDto.from_tuple(pc) for pc in private_courses]
 
     return ResponseBuilder.success_response(content=ItemsDto[PrivateCourseInlineDto](items=private_courses))
 
