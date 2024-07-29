@@ -6,7 +6,7 @@ from src.database.models import TutorCourse, Subject, PrivateCourse
 def get_student_subjects(db: Session, user_id: int, available: bool):
     sub_query = (select(1)
                  .select_from(PrivateCourse)
-                 .filter(PrivateCourse.course_id == TutorCourse.id, user_id == PrivateCourse.student_id)
+                 .filter(PrivateCourse.tutor_course_id == TutorCourse.id, user_id == PrivateCourse.student_id)
                  .exists())
 
     query = (db.query(Subject)

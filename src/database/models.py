@@ -85,13 +85,13 @@ class PrivateCourse(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     student_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    course_id: Mapped[int] = mapped_column(ForeignKey("tutor_courses.id"))
+    tutor_course_id: Mapped[int] = mapped_column(ForeignKey("tutor_courses.id"))
     price: Mapped[int] = mapped_column(Integer)
 
     student: Mapped["User"] = relationship("User", back_populates="private_courses")
     tutor_course: Mapped["TutorCourse"] = relationship("TutorCourse", back_populates="private_courses")
 
-    __table_args__ = (UniqueConstraint(student_id, course_id, name="unique_student_course"),)
+    __table_args__ = (UniqueConstraint(student_id, tutor_course_id, name="unique_student_course"),)
 
     private_classes: Mapped[List["PrivateClass"]] = relationship(
         "PrivateClass", back_populates="private_course", cascade="all, delete-orphan"
